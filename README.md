@@ -1,7 +1,7 @@
 # safar
 ride sharing app
 
-## Features:
+## Pages:
 - [ ] landing Page
     - [ ] login(as a passenger)-> user landing page
     - [ ] login(driver)-> driver landing page
@@ -25,7 +25,7 @@ ride sharing app
 
 
 
-## Page Components
+## Components
 
 - [ ]  Page Components
     - [ ] NavBar -> login/avatar, signup, mode
@@ -34,3 +34,16 @@ ride sharing app
     - [ ] 
     - [ ]
     - [ ] 
+
+
+
+Features:
+    - [ ] Role switch
+    - [ ] All vehicle options
+    - [ ] Add stop points 
+    - [ ] Bargaining 
+    - [ ] Rider rating
+    - [ ] show driver phonenumber as qr on ride success
+    - [ ] * payment
+    - [ ] * tour guide
+    - [ ] * rider priority
