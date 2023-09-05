@@ -37,8 +37,8 @@ const registerNewUser = async (req, res) => {
                   // 2. password matches
               const isMatched = await bcrypt.compare( req.body.password,data.password )
               if(isMatched){
-                const token =await  jwt.sign({ phoneNumber: req.body.phoneNumber }, process.env.SECRET_KEY);
-                res.json({isLoggedIn : true, msg: "Login successful",token}) 
+                const token = jwt.sign({ phoneNumber: req.body.phoneNumber }, process.env.SECRET_KEY);
+                res.json({isLoggedIn : true, msg: "Login successful",token, userInfo:data}) 
               }else{
                 res.status(401).json({msg : "creds error"}) 
           }

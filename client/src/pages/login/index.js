@@ -3,6 +3,7 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useToast } from '@chakra-ui/react'
 import Link from 'next/link'
+import {setLoginDetails } from '../../redux/reducerSlices/userSlice'
 import styles from "../../styles/register.module.css"
 const SigninSchema = Yup.object().shape({
     phoneNumber: Yup.string()
