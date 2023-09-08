@@ -39,6 +39,7 @@ ride sharing app
 
 Features:
     - [ ] Role switch
+    
     - [ ] All vehicle options
     - [ ] Add stop points 
     - [ ] Bargaining 

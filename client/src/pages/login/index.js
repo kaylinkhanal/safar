@@ -3,6 +3,9 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useToast } from '@chakra-ui/react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+
+import {useDispatch} from 'react-redux'
 import {setLoginDetails } from '../../redux/reducerSlices/userSlice'
 import styles from "../../styles/register.module.css"
 const SigninSchema = Yup.object().shape({
@@ -15,6 +18,8 @@ const SigninSchema = Yup.object().shape({
 
  const Login = () => {
   const toast = useToast()
+  const router = useRouter()
+   const dispatch = useDispatch()
    const handleLogin =async (values)=>{
     const res =  await fetch('http://localhost:3005/login', {
       method: 'POST',
@@ -22,6 +27,10 @@ const SigninSchema = Yup.object().shape({
       body: JSON.stringify(values)
     })
     const data = await res.json()
+    if(data.isLoggedIn){
+      dispatch(setLoginDetails(data))
+      router.push('/')
+    }
 
     toast({
       title: data.msg,
@@ -55,10 +64,12 @@ const SigninSchema = Yup.object().shape({
           <br/>
         
           <button type="submit">Submit</button>
-          <p> Don't have an account yet? <Link href="/register">Sign Up </Link>instead</p>
+        
         </Form>
+        
       )}
     </Formik>
+    <p> Don't have an account yet? <Link href="/register">Sign Up </Link>instead</p>
   </div>
 )}
 
