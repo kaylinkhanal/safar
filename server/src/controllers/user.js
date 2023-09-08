@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 
 
 const registerNewUser = async (req, res) => {
-    console.log(req.body)
+
     const userExist = await User.exists({phoneNumber:req.body.phoneNumber})
     if(userExist){
         res.status(409).json({msg: "Phone Number already exists"})
@@ -13,6 +13,7 @@ const registerNewUser = async (req, res) => {
 
         const hashPass = await bcrypt.hash(req.body.password, saltRounds)
         req.body.password= hashPass
+        req.body.role ='User'
 
         const data = await User.create(req.body)
         if(data){
