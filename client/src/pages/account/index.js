@@ -11,7 +11,7 @@ import {
     ModalBody,
     ModalCloseButton,
   } from '@chakra-ui/react'
-import UserForm from '../../components/userFrom'
+import UserForm from '../../components/userFrom/userForm'
 
 function index() {
     const { isOpen, onOpen, onClose } = useDisclosure()
