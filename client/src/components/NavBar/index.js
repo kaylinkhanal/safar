@@ -22,7 +22,6 @@ function NavBar() {
                         <Image src={'/safarLogo.png'} width={'60'} height={'10'} alt='' />
                     </Link>
                 </div>
-
                 {/* Center Navigation Div  */}
                 <div className='flex justify-center text-center rounded-full w-1/3'>
                     <div className=' w-1/4 p-2 rounded-l-full dark: hover:bg-[#CD121F] shadow-inner shadow-slate-900'>
