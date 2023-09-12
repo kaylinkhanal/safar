@@ -1,8 +1,10 @@
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-
+import { TriangleDownIcon } from '@chakra-ui/icons'
 
 import Login from './login'
+import {useEffect, useState} from 'react'
+import {addWishList} from '../redux/reducerSlices/productSlice'
 import { HamburgerIcon, AddIcon,IconButton, ExternalLinkIcon } from '@chakra-ui/icons'
 import {useSelector, useDispatch} from 'react-redux'
 import {logout } from '../redux/reducerSlices/userSlice'
@@ -20,8 +22,7 @@ import {
   MenuDivider,
 } from '@chakra-ui/react'
 const CustomMenu= ()=>{
-  const dispatch = useDispatch()
-  const router = useRouter()
+  const {wishList} = useSelector(state=>state.product)
   return(
     <Menu width={'0px'} height={'50px'}>
     <MenuButton
@@ -35,8 +36,9 @@ const CustomMenu= ()=>{
     </MenuButton>
     <MenuList>
       <div className='flex flex-col justify-center '>
-        <button onClick={()=>router.push('/account')}>My Account</button>
-        <button onClick={()=> dispatch(logout())}>Logout</button>
+       {wishList.length>0 ? wishList.map(item=>{
+        return <button>{item.productName}-{item.productPrice}</button>
+       }): "no wishlist"}
       </div>
     </MenuList>
   </Menu>
@@ -45,42 +47,79 @@ const CustomMenu= ()=>{
 
 
 
-export default function Home() {
-  const {isLoggedIn ,userDetails} = useSelector(state=>state.user)
+// export default function Home() {
+//   const {isLoggedIn ,userDetails} = useSelector(state=>state.user)
 
-  return (
-    <main
-    className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-  >
-    <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-      {isLoggedIn  && userDetails.role != 'Guest-User'  ? (<CustomMenu/>) : (<div>
-      <button>
-        Login
-      </button>
-        <button>
-        Register
-      </button>
-      </div>)}
-      <Input
-          color='teal'
-          placeholder='enter your pickup'
-          _placeholder={{ color: 'inherit' }}
-        />
-            <Input
-          color='teal'
-          placeholder='enter your destination'
-          _placeholder={{ color: 'inherit' }}
-        />
-      <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-        <a
-          className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+//   return (
+//     <main
+//     className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
+//   >
+//     <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
+//       {isLoggedIn  && userDetails.role != 'Guest-User'  ? (<CustomMenu/>) : (<div>
+//       <button>
+//         Login
+//       </button>
+//         <button>
+//         Register
+//       </button>
+//       </div>)}
+//       <Input
+//           color='teal'
+//           placeholder='enter your pickup'
+//           _placeholder={{ color: 'inherit' }}
+//         />
+//             <Input
+//           color='teal'
+//           placeholder='enter your destination'
+//           _placeholder={{ color: 'inherit' }}
+//         />
+//       <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
+//         <a
+//           className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
+//           href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
+//           target="_blank"
+//           rel="noopener noreferrer"
+//         >
            
           
-          <Image
+//           <Image
+//             src="/safarlogo.jpeg"
+//             alt="Vercel Logo"
+//             className="dark:invert"
+//             width={100}
+//             height={24}
+//             priority
+//           />
+//         </a>
+//       </div>
+//     </div>
+
+  
+//   </main>
+//   )
+// }
+
+
+const Home = ()=>{
+  const [productList, setProductList]= useState([])
+   const dispatch = useDispatch()
+  const fetchProductList =async (values)=>{
+    const res =  await fetch('http://localhost:3005/products')
+    const data = await res.json()
+    setProductList(data.productList)
+    }
+  useEffect(()=>{
+    fetchProductList()
+  },[])
+
+  return (
+    <div style={{display: 'flex'}}>
+      <CustomMenu/>
+      {productList.length> 0 && productList.map(item=>{
+        return (
+          <div style={{backgroundColor: 'aqua', width:'250px', margin:'5px', padding:'5px'}}>
+              <TriangleDownIcon onClick={()=>dispatch(addWishList(item))}/>
+             <Image
             src="/safarlogo.jpeg"
             alt="Vercel Logo"
             className="dark:invert"
@@ -88,11 +127,14 @@ export default function Home() {
             height={24}
             priority
           />
-        </a>
-      </div>
-    </div>
+            <p>{item.productName}</p>
+            <p>{item.productPrice}</p>
+          
+            </div>
+        )
+      })}
 
-  
-  </main>
+    </div>
   )
 }
+export default Home
