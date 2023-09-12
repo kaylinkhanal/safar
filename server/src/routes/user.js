@@ -7,10 +7,12 @@ router.post('/register', UserController.registerNewUser)
 
 router.post('/login', UserController.loginUser)
 
+
     
-    router.put('/users/:id', UserController.editUserById)
-    router.delete('/users/:id',UserController.deleteUserById)
+    // router.delete('/users/:id',UserController.deleteUserById)
    
      router.get('/users/:id', UserController.getUserById)
+     
+     router.put('/account/:id', UserController.updateUserDetailsById)
 
    module.exports = router

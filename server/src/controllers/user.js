@@ -47,15 +47,28 @@ const registerNewUser = async (req, res) => {
     }
 
 
-const editUserById=  async (req, res) => {
-    await User.findByIdAndUpdate(req.params.id, req.body)
+    
+
+const updateUserDetailsById=  async (req, res) => {
+  console.log(req.body)
+   const data= await User.findByIdAndUpdate(req.params.id, req.body)
+   if(data){
+     res.json({
+       msg: "User details edited"
+     })
+   }
    }
 
    const deleteUserById =  async (req, res) => {
     await User.findByIdAndDelete(req.params.id, req.body)
      }
+
     const getUserById = async (req, res) => {
-    await User.findByIdAndUpdate(req.params.id, req.body)
+    const data=  await User.findById(req.params.id)
+    if(data){
+      res.json({userDetails:data})
+    }
+  
     }
 
-module.exports = {loginUser, registerNewUser,editUserById,deleteUserById,getUserById}
+module.exports = {loginUser, registerNewUser,updateUserDetailsById,deleteUserById,getUserById}
