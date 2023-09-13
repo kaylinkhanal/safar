@@ -67,7 +67,7 @@ function NavBar() {
                                 </MenuButton>
                                 <MenuList bgColor={'#37304E'}>
                                     <div className='flex flex-col justify-center '>
-                                        <button onClick={() => router.push('/')} className='bg-[#37304E] hover:bg-[#8D7AEC] p-2'>My Account</button>
+                                        <button onClick={() =>router.push('/account')} className='bg-[#37304E] hover:bg-[#8D7AEC] p-2'>My Account</button>
                                         <button
                                             onClick={() => {
                                                 dispatch(logout());

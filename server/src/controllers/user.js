@@ -3,7 +3,11 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 
-
+const uploadImage = async (req, res) => {
+res.json({
+  msg: "image uploaded"
+})
+}
 const registerNewUser = async (req, res) => {
 
     const userExist = await User.exists({phoneNumber:req.body.phoneNumber})
@@ -71,4 +75,4 @@ const updateUserDetailsById=  async (req, res) => {
   
     }
 
-module.exports = {loginUser, registerNewUser,updateUserDetailsById,deleteUserById,getUserById}
+module.exports = {loginUser, uploadImage,registerNewUser,updateUserDetailsById,deleteUserById,getUserById}

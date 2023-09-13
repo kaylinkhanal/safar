@@ -37,6 +37,7 @@ function index() {
             <p>{userDetails.fullName}</p>
             <p>{userDetails.role}</p>
             <p>{userDetails.phoneNumber}</p>
+            <input onChange={e=>console.log(e.target.files[0])} type="file"/>
             </div>
 
         </div>
