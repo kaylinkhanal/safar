@@ -16,6 +16,15 @@ import UserForm from '../../components/userForm'
 function index() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const {userDetails} = useSelector(state=>state.user)
+    const uploadImage = async(file)=> {
+      const formData = new FormData()
+      formData.append('avatar', file)
+      const res =  await fetch('http://localhost:3005/users-image/'+userDetails._id, {
+        method: 'POST',
+        body: formData
+      })
+      const data = await res.json()
+    }
     return (
         <div>
             <h1>Account</h1>
@@ -37,7 +46,7 @@ function index() {
             <p>{userDetails.fullName}</p>
             <p>{userDetails.role}</p>
             <p>{userDetails.phoneNumber}</p>
-            <input onChange={e=>console.log(e.target.files[0])} type="file"/>
+            <input onChange={e=>uploadImage(e.target.files[0])} type="file"/>
             </div>
 
         </div>
