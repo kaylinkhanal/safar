@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
         },
     fullName: String,
     password: String,
+    avatarImage: String,
     role: {
         type: String,
         enum : ['Rider', 'User', 'Admin','Guest-User'],

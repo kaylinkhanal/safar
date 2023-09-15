@@ -11,6 +11,7 @@ import {
     ModalBody,
     ModalCloseButton,
   } from '@chakra-ui/react'
+  import Image from 'next/image'
 import UserForm from '../../components/userForm'
 
 function index() {
@@ -28,6 +29,8 @@ function index() {
     return (
         <div>
             <h1>Account</h1>
+            <Image src={'http://localhost:3005/users-image/'+userDetails._id}
+             width={'60'} height={'10'} alt='' />
             <div style={{padding:'30px', backgroundColor:'pink'}}>
             <Button onClick={onOpen}>Edit</Button>
   

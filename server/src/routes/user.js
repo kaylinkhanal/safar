@@ -8,7 +8,9 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/avatar/')
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname)
+    const imageName = Math.floor(Math.random()*1000000) + file.originalname
+    
+    cb(null, imageName)
   }
 })
 
@@ -17,7 +19,8 @@ router.post('/register', UserController.registerNewUser)
 
 router.post('/login', UserController.loginUser)
 
-    router.post('/users/:id', upload.single('avatar'), UserController.uploadImage)
+    router.post('/users-image/:id', upload.single('avatar'), UserController.uploadImage)
+    router.get('/users-image/:id', UserController.getUserImage)
     // router.delete('/users/:id',UserController.deleteUserById)
    
      router.get('/users/:id',  UserController.getUserById)
