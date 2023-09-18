@@ -29,7 +29,8 @@ function index() {
     return (
         <div>
             <h1>Account</h1>
-            <Image src={'http://localhost:3005/users-image/'+userDetails._id}
+            <Image
+            src={'http://localhost:3005/users-image/'+userDetails._id+'?key='+Math.random()}
              width={'60'} height={'10'} alt='' />
             <div style={{padding:'30px', backgroundColor:'pink'}}>
             <Button onClick={onOpen}>Edit</Button>

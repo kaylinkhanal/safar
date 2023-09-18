@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import Login from './login'
+import {useState,useEffect} from 'react'
 import { HamburgerIcon, AddIcon, IconButton, ExternalLinkIcon } from '@chakra-ui/icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../redux/reducerSlices/userSlice'
@@ -17,6 +18,7 @@ import {
   MenuOptionGroup,
   MenuDivider,
 } from '@chakra-ui/react'
+import { GoogleMap,MarkerF, useJsApiLoader } from '@react-google-maps/api'
 
 // Import of NavBar 
 import NavBar from '../components/NavBar/index'
@@ -47,8 +49,22 @@ const CustomMenu = () => {
 }
 
 export default function Home() {
+  const [currentPos , setCurrentPos ] = useState({
+    lat: 27.700769,
+    lng: 85.300140
+  })
   const { isLoggedIn, userDetails } = useSelector(state => state.user)
-
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: "AIzaSyDLfjmFgDEt9_G2LXVyP61MZtVHE2M3H-0" // ,
+    // ...otherOptions
+  })
+  useEffect(()=>{
+    navigator.geolocation.getCurrentPosition(latlan=>{
+      const {latitude, longitude} = latlan.coords
+      setCurrentPos({lat:latitude, lng:longitude })
+    })
+    
+  },[])
   return (
     <main className={'min-h-screen dark:bg-[#37304E]'}>
       <NavBar />
@@ -57,7 +73,25 @@ export default function Home() {
       <div className='flex justify-center p-2 mt-2'>
         <Image src={'/bg.jpeg'} width={'600'} height={'600'} alt='' />
       </div>
-
+      {isLoaded && (
+         <GoogleMap
+         id="circle-example"
+         mapContainerStyle={{
+           height: "400px",
+           width: "800px"
+         }}
+         zoom={13}
+         center={{
+           lat: 27.700769,
+           lng: 85.300140
+         }}
+       >
+           <MarkerF
+           draggable= {true}
+      position={currentPos}
+    />
+         </GoogleMap>
+      )}
       {/* Share the Ride  */}
       <div className='flex justify-center items-center flex-col'>
         <h1 className='font-mono text-5xl text-gray-200 antialiased font-semibold line-clamp-1'>Share the ride</h1>
