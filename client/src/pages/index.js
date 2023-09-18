@@ -18,7 +18,7 @@ import {
   MenuOptionGroup,
   MenuDivider,
 } from '@chakra-ui/react'
-import { GoogleMap,MarkerF, useJsApiLoader } from '@react-google-maps/api'
+import { GoogleMap,MarkerF,Autocomplete, useJsApiLoader } from '@react-google-maps/api'
 
 // Import of NavBar 
 import NavBar from '../components/NavBar/index'
@@ -55,8 +55,8 @@ export default function Home() {
   })
   const { isLoggedIn, userDetails } = useSelector(state => state.user)
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyDLfjmFgDEt9_G2LXVyP61MZtVHE2M3H-0" // ,
-    // ...otherOptions
+    googleMapsApiKey: "AIzaSyDLfjmFgDEt9_G2LXVyP61MZtVHE2M3H-0", // ,
+    libraries:["places"]
   })
   useEffect(()=>{
     navigator.geolocation.getCurrentPosition(latlan=>{
@@ -90,8 +90,13 @@ export default function Home() {
            draggable= {true}
       position={currentPos}
     />
+ 
+   
          </GoogleMap>
       )}
+         <Autocomplete>
+    <input/>
+    </Autocomplete>
       {/* Share the Ride  */}
       <div className='flex justify-center items-center flex-col'>
         <h1 className='font-mono text-5xl text-gray-200 antialiased font-semibold line-clamp-1'>Share the ride</h1>
