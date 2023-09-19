@@ -23,6 +23,19 @@ import { GoogleMap,MarkerF,Autocomplete, useJsApiLoader } from '@react-google-ma
 // Import of NavBar 
 import NavBar from '../components/NavBar/index'
 
+const PlacesCard = (props)=> {
+
+ 
+    return (
+      <div>
+ 
+        {props.searchedPlaceListlength> 0 && props.searchedPlaceList.map((item)=>{
+          return <div>{item.formatted}</div>
+        })}
+      </div>
+    )
+ 
+}
 
 const CustomMenu = () => {
   const dispatch = useDispatch()
@@ -53,6 +66,7 @@ export default function Home() {
     lat: 27.700769,
     lng: 85.300140
   })
+  const [searchedPlaceList, setSearchedPlaceList]= useState([])
   const { isLoggedIn, userDetails } = useSelector(state => state.user)
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyDLfjmFgDEt9_G2LXVyP61MZtVHE2M3H-0", // ,
@@ -65,6 +79,15 @@ export default function Home() {
     })
     
   },[])
+
+  const generatePlaces = async(text)=> {
+   const res = await fetch(`https://api.geoapify.com/v1/geocode/autocomplete?text=${text}&format=json&apiKey=a1dd45a7dfc54f55a44b69d125722fcb`)
+  const data = await res.json()
+   if(data.results){
+      setSearchedPlaceList(data.results)
+    }
+  
+  }
   return (
     <main className={'min-h-screen dark:bg-[#37304E]'}>
       <NavBar />
@@ -94,9 +117,8 @@ export default function Home() {
    
          </GoogleMap>
       )}
-         <Autocomplete>
-    <input/>
-    </Autocomplete>
+
+         
       {/* Share the Ride  */}
       <div className='flex justify-center items-center flex-col'>
         <h1 className='font-mono text-5xl text-gray-200 antialiased font-semibold line-clamp-1'>Share the ride</h1>
@@ -106,10 +128,16 @@ export default function Home() {
       {/* Enter desitination and pickup  */}
       <div className='flex justify-center mt-8 px-32 space-x-5 w-full h-22'>
         <div className="mb-6 flex justify-center flex-col w-1/3">
-          <input type="text" id="default-input" placeholder='Enter your pickup point' className="h-12 bg-[#37304E] px-4 text-gray-900 text-center text-sm rounded-full shadow-inner shadow-slate-900"></input>
+          <input 
+          onChange={e=>generatePlaces(e.target.value)}
+          type="text" id="default-input" placeholder='Enter your pickup point' className="h-12 bg-[#37304E] px-4 text-gray-900 text-center text-sm rounded-full shadow-inner shadow-slate-900"></input>
+          <div>
+            <PlacesCard  chocolate="kitkat" searchedPlaceList={searchedPlaceList}/>
+          </div>
         </div>
         <div className="mb-6 flex justify-center flex-col w-1/3 ">
           <input type="text" id="default-input" placeholder='Enter your destination point' className="h-12 px-4 bg-[#37304E] text-gray-900 text-center text-sm rounded-full shadow-inner shadow-slate-900"></input>
+          
         </div>
       </div>
 

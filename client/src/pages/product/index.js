@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useToast } from '@chakra-ui/react'
@@ -15,13 +15,18 @@ const SignupSchema = Yup.object().shape({
 });
 
 
- const Register = () => {
+ const Product = () => {
+   const [file, setFile] = useState(null)
   const toast = useToast()
    const handleRegister =async (values)=>{
+    const formData = new FormData()
+    for(let item in values){
+      formData.append(item, values[item])
+      }
+      formData.append('productImage', file)
     const res =  await fetch('http://localhost:3005/products', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values)
+      body: formData
     })
     const data = await res.json()
 
@@ -34,8 +39,9 @@ const SignupSchema = Yup.object().shape({
       initialValues={{
         productPrice: '',
         productName: '',
-        password: '',
-        productDescription: ''
+        productDescription: '',
+        productCategory: '',
+
       }}
       validationSchema={SignupSchema}
       onSubmit={(values,{resetForm}) => {
@@ -60,6 +66,7 @@ const SignupSchema = Yup.object().shape({
           <Field name="productDescription"  placeholder="productDescription" />
           {errors.productDescription && touched.productDescription ? <div>{errors.productDescription}</div> : null}
           <br/>
+          <input onChange={e=>setFile(e.target.files[0])} type="file"/>
           <button type="submit">Submit</button>
         </Form>
       )}
@@ -67,6 +74,6 @@ const SignupSchema = Yup.object().shape({
   </div>
 )}
 
-export default Register
+export default Product
 
 

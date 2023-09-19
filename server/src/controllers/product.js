@@ -2,6 +2,7 @@ const Product = require('../models/product')
 
 
 const addNewProduct = async (req, res) => {
+  req.body.productImage = req.file?.filename
   await Product.create(req.body)
     }
 
