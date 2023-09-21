@@ -1,0 +1,10 @@
+.autocompleteBox{
+    margin: 20px;
+    border: 1px solid #000
+}
+.autocompleteList{
+    margin: 10px;
+    padding: 5px;
+    background-color: rgb(244, 244, 244);
+
+}
