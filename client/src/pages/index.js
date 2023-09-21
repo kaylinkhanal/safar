@@ -34,8 +34,8 @@ const PlacesCard = (props)=> {
         {props.searchedPlaceList.length> 0 && props.searchedPlaceList.map((item)=>{
           return <div
           onClick={()=> {
-             props.setPickInputAddress(item.formatted)
-             props.setPickUpOpen(false)
+             props.setAddress(item.formatted)
+             props.setOpen(false)
           }}
           className={styles.autocompleteList}>{item.formatted.length>15 ? item.formatted.substring(0,15) + '...' : item.formatted}</div>
         })}
@@ -73,10 +73,12 @@ export default function Home() {
     lat: 27.700769,
     lng: 85.300140
   })
-  const [isSelectionOngoing, setIsSelectionOngoing]= useState(false)
-  const [pickInputAddress,setPickInputAddress] = useState('')
-  const [pickUpOpen,setPickUpOpen] = useState(false)
-  const [searchedPlaceList, setSearchedPlaceList]= useState([])
+  const [isSelectionOngoing, setIsSelectionOngoing] = useState(false);
+  const [pickInputAddress, setPickInputAddress] = useState("");
+  const [dropInputAddress, setDropInputAddress] = useState("");
+  const [pickUpOpen, setPickUpOpen] = useState(false);
+  const [dropOpen, setDropOpen] = useState(false);
+  const [searchedPlaceList, setSearchedPlaceList] = useState([]);
   const { isLoggedIn, userDetails } = useSelector(state => state.user)
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
@@ -90,16 +92,23 @@ export default function Home() {
     
   },[])
 
-  const generatePlaces = async(text)=> {
-    setPickUpOpen(true)
-    setPickInputAddress(text)
-   const res = await fetch(`https://api.geoapify.com/v1/geocode/autocomplete?text=${text}&format=json&apiKey=a1dd45a7dfc54f55a44b69d125722fcb`)
-  const data = await res.json()
-   if(data.results){
-      setSearchedPlaceList(data.results)
+  const generatePlaces = async (text, pick) => {
+    if (pick) {
+      console.log(pick, "iam pickup");
+      setPickUpOpen(true);
+      setPickInputAddress(text);
+    } else {
+      setDropOpen(true);
+      setDropInputAddress(text);
     }
-  
-  }
+    const res = await fetch(
+      `https://api.geoapify.com/v1/geocode/autocomplete?text=${text}&format=json&apiKey=a1dd45a7dfc54f55a44b69d125722fcb`
+    );
+    const data = await res.json();
+    if (data.results) {
+      setSearchedPlaceList(data.results);
+    }
+  };
   return (
     <main className={'min-h-screen dark:bg-[#37304E]'}>
       <NavBar />
@@ -141,18 +150,41 @@ export default function Home() {
       <div className='flex justify-center mt-8 px-32 space-x-5 w-full h-22'>
         <div className="mb-6 flex justify-center flex-col w-1/3">
           <input 
-          value={pickInputAddress}
-          onBlur={()=> !isSelectionOngoing && setPickUpOpen(false)}
-          onChange={e=>generatePlaces(e.target.value)}
-          type="text" id="default-input" placeholder='Enter your pickup point' className="h-12 bg-red px-4 text-gray-900 text-center text-sm rounded-full shadow-inner shadow-slate-900"></input>
-          {pickUpOpen &&  <PlacesCard
-          isSelectionOngoing={isSelectionOngoing}
-          setIsSelectionOngoing= {setIsSelectionOngoing}
-          setPickUpOpen={setPickUpOpen} setPickInputAddress={setPickInputAddress} chocolate="kitkat" searchedPlaceList={searchedPlaceList}/>}
-       
+              value={pickInputAddress}
+              onBlur={() => !isSelectionOngoing && setPickUpOpen(false)}
+              onChange={(e) => generatePlaces(e.target.value, true)}
+              type="text"
+              id="default-input"
+              placeholder="Enter your pickup point"
+            ></input>
+            {pickUpOpen && (
+              <PlacesCard
+                isSelectionOngoing={isSelectionOngoing}
+                setIsSelectionOngoing={setIsSelectionOngoing}
+                setOpen={setPickUpOpen}
+                setAddress={setPickInputAddress}
+                searchedPlaceList={searchedPlaceList}
+              />
+            )}
         </div>
         <div className="mb-6 flex justify-center flex-col w-1/3 ">
-          <input type="text" id="default-input" placeholder='Enter your destination point' className="h-12 px-4 bg-[#37304E] text-gray-900 text-center text-sm rounded-full shadow-inner shadow-slate-900"></input>
+          <input 
+              value={dropInputAddress}
+              onBlur={() => !isSelectionOngoing && setDropOpen(false)}
+              onChange={(e) => generatePlaces(e.target.value, false)}
+              type="text"
+              id="default-input"
+              placeholder="Enter your Destination"
+            ></input>
+            {dropOpen && (
+              <PlacesCard
+                isSelectionOngoing={isSelectionOngoing}
+                setIsSelectionOngoing={setIsSelectionOngoing}
+                setOpen={setDropOpen}
+                setAddress={setDropInputAddress}
+                searchedPlaceList={searchedPlaceList}
+              />
+            )}
           
         </div>
       </div>
