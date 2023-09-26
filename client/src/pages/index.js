@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import Login from "./login";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   HamburgerIcon,
   AddIcon,
@@ -95,6 +95,7 @@ export default function Home() {
     lat: 27.700769,
     lng: 85.30014,
   });
+  const pickInputRef = useRef(null)
   const [isSelectionOngoing, setIsSelectionOngoing] = useState(false);
   const [pickInputAddress, setPickInputAddress] = useState("");
   const [destinationInputAddress, setDestinationInputAddress] = useState("");
@@ -113,6 +114,8 @@ export default function Home() {
       const { latitude, longitude } = latlan.coords;
       setCurrentPos({ lat: latitude, lng: longitude });
     });
+    pickInputRef?.current?.focus()
+  
   }, []);
 
   const generatePickUpPlaces = async (text) => {
@@ -126,6 +129,11 @@ export default function Home() {
       setSearchedPlaceList(data.results);
     }
   };
+
+  const changePickUpAddress = (e)=> {
+    console.log(e)
+    fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${e.latLng.lat()}&lon=${e.latLng.lng()}&apiKey=a1dd45a7dfc54f55a44b69d125722fcb`)
+  }
   const generateDestinationPlaces = async (text) => {
     setDestinationOpen(true);
     setDestinationInputAddress(text);
@@ -150,6 +158,7 @@ export default function Home() {
           {/* Pickup Section */}
           <div className="mb-6 flex justify-center flex-col relative">
             <input
+            ref={pickInputRef}
               value={pickInputAddress}
               onBlur={() => !isSelectionOngoing && setPickUpOpen(false)}
               onChange={(e) => generatePickUpPlaces(e.target.value)}
@@ -175,7 +184,7 @@ export default function Home() {
                         className={styles.autocompleteList}
                       >
                         {item.formatted.length > 15
-                          ? item.formatted.substring(0, 15) + "..."
+                          ? item.formatted.substring(0, 32) + "..."
                           : item.formatted}
                       </div>
                     );
@@ -240,6 +249,10 @@ export default function Home() {
                 lng: 85.30014,
               }}
             >
+              <MarkerF
+              onDragEnd={changePickUpAddress}
+              draggable={true}
+               position={currentPos} />
               <MarkerF draggable={true} position={currentPos} />
             </GoogleMap>
           )}
