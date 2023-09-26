@@ -96,14 +96,16 @@ export default function Home() {
     lng: 85.30014,
   });
   const pickInputRef = useRef(null)
+  const [zoom, setZoom] = useState(13)
   const [isSelectionOngoing, setIsSelectionOngoing] = useState(false);
   const [pickInputAddress, setPickInputAddress] = useState("");
   const [destinationInputAddress, setDestinationInputAddress] = useState("");
-
   const [pickUpOpen, setPickUpOpen] = useState(false);
   const [destinationOpen, setDestinationOpen] = useState(false);
-
+  const [pickInputFocus,setPickInputFocus ] = useState(false)
   const [searchedPlaceList, setSearchedPlaceList] = useState([]);
+  
+  
   const { isLoggedIn, userDetails } = useSelector((state) => state.user);
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
@@ -130,9 +132,17 @@ export default function Home() {
     }
   };
 
-  const changePickUpAddress = (e)=> {
-    console.log(e)
-    fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${e.latLng.lat()}&lon=${e.latLng.lng()}&apiKey=a1dd45a7dfc54f55a44b69d125722fcb`)
+  const changePickUpAddress = async(e)=> {
+    setCurrentPos({
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng()
+    })
+
+   const res= await fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${e.latLng.lat()}&lon=${e.latLng.lng()}&apiKey=a1dd45a7dfc54f55a44b69d125722fcb`)
+   const data= await res.json()
+   if(data){
+    setPickInputAddress(data.features[0].properties.formatted)
+   }
   }
   const generateDestinationPlaces = async (text) => {
     setDestinationOpen(true);
@@ -145,6 +155,8 @@ export default function Home() {
       setSearchedPlaceList(data.results);
     }
   };
+
+
   return (
     <main className={"min-h-screen dark:bg-[#37304E] flex"}>
       <div className="w-2/5 p-4 bg-gray-200 dark:bg-gray-800">
@@ -160,7 +172,10 @@ export default function Home() {
             <input
             ref={pickInputRef}
               value={pickInputAddress}
-              onBlur={() => !isSelectionOngoing && setPickUpOpen(false)}
+              onFocus={()=> setPickInputFocus(true) }
+              onBlur={() =>{ !isSelectionOngoing && setPickUpOpen(false)
+                setPickInputFocus(false)
+              }}
               onChange={(e) => generatePickUpPlaces(e.target.value)}
               type="text"
               id="default-input"
@@ -178,6 +193,11 @@ export default function Home() {
                     return (
                       <div
                         onClick={() => {
+                          setCurrentPos({
+                            lat: item.lat,
+                            lng: item.lon
+                          })
+                          setZoom(14)
                           setPickInputAddress(item.formatted);
                           setPickUpOpen(false);
                         }}
@@ -243,17 +263,23 @@ export default function Home() {
                 height: "400px",
                 width: "800px",
               }}
-              zoom={13}
-              center={{
+              zoom={zoom}
+              center={currentPos.lat ? currentPos :{
                 lat: 27.700769,
                 lng: 85.30014,
               }}
             >
-              <MarkerF
-              onDragEnd={changePickUpAddress}
-              draggable={true}
-               position={currentPos} />
-              <MarkerF draggable={true} position={currentPos} />
+             <MarkerF
+                onDragEnd={changePickUpAddress}
+                draggable={true}
+                position={currentPos} />
+            
+            {!pickInputFocus && <MarkerF
+                onDragEnd={changePickUpAddress}
+                draggable={true}
+                position={currentPos} />
+            }
+        
             </GoogleMap>
           )}
         </div>
