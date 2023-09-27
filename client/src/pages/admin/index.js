@@ -25,6 +25,7 @@ const index = () => {
       body: JSON.stringify(values),
     });
     const data = await res.json();
+
     toast({
       title: data.msg,
       status: res.status == 409 ? "warning" : "success",

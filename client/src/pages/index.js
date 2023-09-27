@@ -31,6 +31,10 @@ export default function Home() {
   const [searchedPlaceList, setSearchedPlaceList] = useState([]);
   const [selectBike, setSelectBike] = useState(false);
   const [selectCar, setSelectCar] = useState(false);
+  const [vehicleFare, setVehicleFare] = useState([
+    { bikeFare: "" },
+    { carFare: "" },
+  ]);
 
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
@@ -125,18 +129,17 @@ export default function Home() {
   }
   const VehicleType = async (values) => {
     // if (values === "Bike") {
-    //   const res = await fetch("http://localhost:3005/vehicleType", {
-    //     method: "GET",
-    //   });
-    //   if (res) {
-    //     console.log(res);
-    //   }
-    // }
-    const res = await fetch("http://localhost:3005/vehicleType", {
+    const res = await fetch("http://localhost:3005/vehicleType/", {
       method: "GET",
     });
-    if (res) {
-      console.log(res);
+    const data = await res.json();
+    if (data) {
+      console.log(data.data[0].vehicleFare);
+      console.log(data.data[1].vehicleFare);
+      setVehicleFare([
+        { bikeFare: data.data[0].vehicleFare },
+        { carFare: data.data[1].vehicleFare },
+      ]);
     }
   };
 
@@ -158,7 +161,12 @@ export default function Home() {
             ) : (
               <div
                 className={`p-4   ${styles1.vehicleIcon}`}
-                onClick={() => handleBikeFare()}
+                onClick={() => {
+                  handleBikeFare();
+                  if (!vehicleFare) {
+                    VehicleType();
+                  }
+                }}
               >
                 <TwoWheelerIcon theme={theme} />
               </div>
@@ -167,7 +175,10 @@ export default function Home() {
               <div
                 className={`p-4   ${styles1.vehicleSelected}`}
                 onClick={() => {
-                  handleCarFare(), VehicleType();
+                  handleCarFare();
+                  if (!vehicleFare) {
+                    VehicleType();
+                  }
                 }}
               >
                 <LocalTaxiIcon theme={theme} />
@@ -176,7 +187,10 @@ export default function Home() {
               <div
                 className={`p-4   ${styles1.vehicleIcon}`}
                 onClick={() => {
-                  handleCarFare(), VehicleType();
+                  handleCarFare();
+                  if (!vehicleFare) {
+                    VehicleType();
+                  }
                 }}
               >
                 <LocalTaxiIcon theme={theme} />
@@ -280,7 +294,7 @@ export default function Home() {
           <div className="text-white center text-xl flex justify-evenly mt-20 text-center p-5 content-center">
             <div className="bg-gray-400 p-10 text-black">
               <h1>Your Total Fare:</h1>
-              Rs. 200
+              Rs. {vehicleFare[0].bikeFare}
             </div>
             <div>
               <h1>Your Total Distance:</h1>
@@ -292,7 +306,7 @@ export default function Home() {
           <div className="text-white center text-xl flex justify-evenly mt-20 text-center p-5 content-center">
             <div className="bg-gray-400 p-10 text-black">
               <h1>Your Total Fare:</h1>
-              Rs. 1000
+              Rs. {vehicleFare[1].carFare}
             </div>
             <div>
               <h1>Your Total Distance:</h1>
