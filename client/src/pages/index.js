@@ -95,6 +95,7 @@ export default function Home() {
     lat: 27.700769,
     lng: 85.30014,
   });
+  
   const pickInputRef = useRef(null)
   const [zoom, setZoom] = useState(13)
   const [isSelectionOngoing, setIsSelectionOngoing] = useState(false);
@@ -142,6 +143,13 @@ export default function Home() {
    const data= await res.json()
    if(data){
     setPickInputAddress(data.features[0].properties.formatted)
+   }
+  }
+  const changeDestAddress = async(e)=> {
+   const res= await fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${e.latLng.lat()}&lon=${e.latLng.lng()}&apiKey=a1dd45a7dfc54f55a44b69d125722fcb`)
+   const data= await res.json()
+   if(data){
+    setDestinationInputAddress(data.features[0].properties.formatted)
    }
   }
   const generateDestinationPlaces = async (text) => {
@@ -274,11 +282,11 @@ export default function Home() {
                 draggable={true}
                 position={currentPos} />
             
-            {!pickInputFocus && <MarkerF
-                onDragEnd={changePickUpAddress}
+           <MarkerF
+                onDragEnd={changeDestAddress}
                 draggable={true}
                 position={currentPos} />
-            }
+            
         
             </GoogleMap>
           )}
