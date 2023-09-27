@@ -28,7 +28,12 @@ const Login = () => {
     const data = await res.json();
     if (data.isLoggedIn) {
       dispatch(setLoginDetails(data));
-      router.push("/");
+      if(data.userInfo.role == 'Admin'){
+        router.push("/admin");
+      }else{
+        router.push("/");
+
+      }
     }
 
     toast({
@@ -37,6 +42,7 @@ const Login = () => {
       isClosable: true,
     });
   };
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">

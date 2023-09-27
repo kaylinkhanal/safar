@@ -6,6 +6,17 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import styles from "../styles/map.module.css";
+const priceMap = [
+  {
+    vehicleType: 'Car',
+    pricePerUnitKm: 30
+  },
+  {
+    vehicleType: 'Bike',
+    pricePerUnitKm: 10
+  },
+  
+]
 
 export default function Home() {
   const [currentInputPos, setCurrentInputPos] = useState({
@@ -25,7 +36,7 @@ export default function Home() {
   const [destinationOpen, setDestinationOpen] = useState(false);
   const [pickInputFocus, setPickInputFocus] = useState(false);
   const [searchedPlaceList, setSearchedPlaceList] = useState([]);
-
+  const [stopPosition, setStopPosition]= useState({})
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
     libraries: ["places"],
@@ -85,7 +96,7 @@ export default function Home() {
     setDestinationOpen(true);
     setDestinationInputAddress(text);
     const res = await fetch(
-      `https://api.geoapify.com/v1/geocode/autocomplete?text=${text}&format=json&apiKey=a1dd45a7dfc54f55a44b69d125722fcb`
+      `https://api.priceMap.com/v1/geocode/autocomplete?text=${text}&format=json&apiKey=a1dd45a7dfc54f55a44b69d125722fcb`
     );
     const data = await res.json();
     if (data.results) {
@@ -114,6 +125,11 @@ export default function Home() {
             </h1>
           </div>
           {/* Pickup Section */}
+          {priceMap.map(item=>{
+            return (
+              <button>{item.vehicleType}</button>
+            )
+          })}
           <div className="mb-6 flex justify-center flex-col relative">
             <input
               ref={pickInputRef}
@@ -199,7 +215,9 @@ export default function Home() {
                   })}
               </div>
             )}
+           <button onClick={()=>setStopPosition(stopPosition.lat  ? {} : currentDestinationPos)}>{stopPosition.lat ? 'Remove Stop' : 'Add Stop'}</button> 
           </div>
+
         </div>
       </div>
       <div className="w-3/5 p-4">
@@ -225,6 +243,14 @@ export default function Home() {
                     }
               }
             >
+              {stopPosition.lat && (
+                <MarkerF
+                // onDragEnd={changePickUAddress}
+                draggable={true}
+                position={stopPosition}
+                icon={pickupIcon}
+              />
+              )}
               <MarkerF
                 onDragEnd={changePickUpAddress}
                 draggable={true}
