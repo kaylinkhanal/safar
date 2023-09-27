@@ -6,6 +6,10 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import styles from "../styles/map.module.css";
+import TwoWheelerIcon from "@mui/icons-material/TwoWheeler";
+import LocalTaxiIcon from "@mui/icons-material/LocalTaxi";
+import styles1 from "../styles/register.module.css";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 export default function Home() {
   const [currentInputPos, setCurrentInputPos] = useState({
@@ -25,6 +29,8 @@ export default function Home() {
   const [destinationOpen, setDestinationOpen] = useState(false);
   const [pickInputFocus, setPickInputFocus] = useState(false);
   const [searchedPlaceList, setSearchedPlaceList] = useState([]);
+  const [selectBike, setSelectBike] = useState(false);
+  const [selectCar, setSelectCar] = useState(false);
 
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
@@ -102,12 +108,81 @@ export default function Home() {
     url: "https://cdn-icons-png.flaticon.com/512/76/76865.png",
     scaledSize: { width: 50, height: 50 },
   };
+  const theme = createTheme({
+    typography: {
+      // In Chinese and Japanese the characters are usually larger,
+      // so a smaller fontsize may be appropriate.
+      fontSize: 22,
+    },
+  });
+  function handleBikeFare() {
+    setSelectBike(true);
+    setSelectCar(false);
+  }
+  function handleCarFare() {
+    setSelectBike(false);
+    setSelectCar(true);
+  }
+  const VehicleType = async (values) => {
+    // if (values === "Bike") {
+    //   const res = await fetch("http://localhost:3005/vehicleType", {
+    //     method: "GET",
+    //   });
+    //   if (res) {
+    //     console.log(res);
+    //   }
+    // }
+    const res = await fetch("http://localhost:3005/vehicleType", {
+      method: "GET",
+    });
+    if (res) {
+      console.log(res);
+    }
+  };
 
   return (
     <main className={"min-h-screen dark:bg-[#37304E] flex"}>
       <div className="w-2/5 p-4 bg-gray-200 dark:bg-gray-800">
         {/* Enter desitination and pickup  */}
         <div className="flex flex-col justify-center mt-8 w-full h-22 relative">
+          <div className="flex justify-center text-white m-3 p-3">
+            {selectBike ? (
+              <div
+                className={`p-4   ${styles1.vehicleSelected}`}
+                onClick={() => {
+                  handleBikeFare(), VehicleType();
+                }}
+              >
+                <TwoWheelerIcon theme={theme} />
+              </div>
+            ) : (
+              <div
+                className={`p-4   ${styles1.vehicleIcon}`}
+                onClick={() => handleBikeFare()}
+              >
+                <TwoWheelerIcon theme={theme} />
+              </div>
+            )}
+            {selectCar ? (
+              <div
+                className={`p-4   ${styles1.vehicleSelected}`}
+                onClick={() => {
+                  handleCarFare(), VehicleType();
+                }}
+              >
+                <LocalTaxiIcon theme={theme} />
+              </div>
+            ) : (
+              <div
+                className={`p-4   ${styles1.vehicleIcon}`}
+                onClick={() => {
+                  handleCarFare(), VehicleType();
+                }}
+              >
+                <LocalTaxiIcon theme={theme} />
+              </div>
+            )}
+          </div>
           <div className="flex justify-center items-center flex-col">
             <h1 className="font-mono pb-5 text-gray-500 antialiased font-semibold line-clamp-1">
               Share the ride
@@ -201,6 +276,30 @@ export default function Home() {
             )}
           </div>
         </div>
+        {selectBike && currentDestinationPos?.lat && (
+          <div className="text-white center text-xl flex justify-evenly mt-20 text-center p-5 content-center">
+            <div className="bg-gray-400 p-10 text-black">
+              <h1>Your Total Fare:</h1>
+              Rs. 200
+            </div>
+            <div>
+              <h1>Your Total Distance:</h1>
+              10000 m
+            </div>
+          </div>
+        )}
+        {selectCar && currentDestinationPos?.lat && (
+          <div className="text-white center text-xl flex justify-evenly mt-20 text-center p-5 content-center">
+            <div className="bg-gray-400 p-10 text-black">
+              <h1>Your Total Fare:</h1>
+              Rs. 1000
+            </div>
+            <div>
+              <h1>Your Total Distance:</h1>
+              1000 m
+            </div>
+          </div>
+        )}
       </div>
       <div className="w-3/5 p-4">
         <p className="text-1xl text-center text-gray-500 antialiased font-semibold">
