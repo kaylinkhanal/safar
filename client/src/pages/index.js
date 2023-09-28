@@ -272,9 +272,12 @@ export default function Home() {
             >
               {stopPosition.lat && (
                 <MarkerF
+                icon={{
+                  path: google.maps.SymbolPath.CIRCLE,
+                  scale: 7,
+                }}
                   draggable={true}
                   position={stopPosition}
-                  icon={stopIcon}
                 />
               )}
               <MarkerF
