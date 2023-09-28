@@ -4,3 +4,20 @@
     margin: 20px;
     border: 1px solid #000
 } */
+.vehicleIcon{
+  border: 1px solid white;
+  margin: 1.3rem;
+  border-radius: 20px;
+  
+}
+.vehicleIcon:hover{
+    background-color: rgb(137, 140, 143);
+    border-color: black;
+}
+.vehicleSelected{
+    background-color: rgb(137, 140, 143);
+    border: 1px solid black;
+         margin: 1.3rem;
+  border-radius: 20px;
+
+}
