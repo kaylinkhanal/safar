@@ -5,12 +5,14 @@ import { useRouter } from "next/router";
 const AddVehicleSchema = Yup.object().shape({
   vehicleType: Yup.string().required("Required"),
   pricePerKm: Yup.number().required("Required"),
+  basePrice: Yup.number().required("Required"),
+  iconUrl: Yup.string(),
 });
 
 export default function AddProduct() {
   const router = useRouter();
   const createVehicle = async (values) => {
-    const res = await fetch("http://localhost:3005/addvehicleinfo", {
+    const res = await fetch("http://localhost:3005/vehicles", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(values),
@@ -33,6 +35,8 @@ export default function AddProduct() {
             initialValues={{
               vehicleType: "",
               pricePerKm: "",
+              basePrice: "",
+              iconUrl: "",
             }}
             validationSchema={AddVehicleSchema}
             onSubmit={async (values, { resetForm }) => {
@@ -63,6 +67,23 @@ export default function AddProduct() {
                   {errors.pricePerKm && touched.pricePerKm ? (
                     <div>{errors.pricePerKm}</div>
                   ) : null}
+                  <label className="block text-sm font-medium leading-6 text-gray-900">
+                    Base Price
+                  </label>
+                  <Field
+                    name="basePrice"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                  {errors.basePrice && touched.basePrice ? (
+                    <div>{errors.basePrice}</div>
+                  ) : null}
+                  <label className="block text-sm font-medium leading-6 text-gray-900">
+                    Icon URL
+                  </label>
+                  <Field
+                    name="iconUrl"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
 
                   <button
                     type="submit"

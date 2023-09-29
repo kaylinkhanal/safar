@@ -3,14 +3,14 @@ const express = require("express");
 const router = express.Router();
 const VehicleController = require("../controllers/vehicle");
 
-router.post("/addvehicleinfo", VehicleController.addVehicleInfo);
+router.post("/vehicles", VehicleController.addVehicleInfo);
 
-router.get("/getVehicleInfo/:id", VehicleController.getVehicleInfo);
+router.get("/vehicles/:id", VehicleController.getVehicleInfo);
 
-router.delete("/deletevehicleinfo/:id", VehicleController.deleteVehicleInfo);
+router.delete("/vehicles/:id", VehicleController.deleteVehicleInfo);
 
-router.put("/updatevehicleinfo/:id", VehicleController.updateVehicleInfo);
+router.put("/vehicles/:id", VehicleController.updateVehicleInfo);
 
-router.get("/getVehicles", VehicleController.getVehicles);
+router.get("/vehicles", VehicleController.getVehicles);
 
 module.exports = router;
