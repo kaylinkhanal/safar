@@ -76,7 +76,7 @@ const registerNewUser = async (req, res) => {
 const loginUser = async (req, res) => {
   // 1. phonenumber exist
   const data = await User.findOne({ phoneNumber: req.body.phoneNumber }).lean();
-  console.log(data);
+
   if (!data) {
     return res.status(404).json({ msg: "user not found" });
   } else {

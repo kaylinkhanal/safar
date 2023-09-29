@@ -6,17 +6,7 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import styles from "../styles/map.module.css";
-const priceMap = [
-  {
-    vehicleType: 'Car',
-    pricePerUnitKm: 30
-  },
-  {
-    vehicleType: 'Bike',
-    pricePerUnitKm: 10
-  },
-  
-]
+import { getDistance } from 'geolib';
 
 export default function Home() {
   const [currentInputPos, setCurrentInputPos] = useState({
@@ -36,18 +26,31 @@ export default function Home() {
   const [destinationOpen, setDestinationOpen] = useState(false);
   const [pickInputFocus, setPickInputFocus] = useState(false);
   const [searchedPlaceList, setSearchedPlaceList] = useState([]);
-  const [stopPosition, setStopPosition]= useState({})
+  const [stopPosition, setStopPosition] = useState({});
+  const [vehicleTypeList, setVehiclesTypeList] = useState([])
+  const [selectedVehicle,setSelectedVehicle ]= useState({})
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
     libraries: ["places"],
   });
+  const getVehicleType = async (values) => {
+    const res = await fetch("http://localhost:3005/vehicles/", {
+      method: "GET",
+    });
+    const data = await res.json();
+    if (data) {
+      setVehiclesTypeList(data)
+    }
+  };
   useEffect(() => {
+    getVehicleType()
     navigator.geolocation.getCurrentPosition((latlan) => {
       const { latitude, longitude } = latlan.coords;
       setCurrentInputPos({ lat: latitude, lng: longitude });
     });
     pickInputRef?.current?.focus();
   }, []);
+
 
   const generatePickUpPlaces = async (text) => {
     setPickUpOpen(true);
@@ -104,14 +107,19 @@ export default function Home() {
     }
   };
 
-  const pickupIcon = {
-    url: "https://cdn1.iconfinder.com/data/icons/real-estate-building-flat-vol-3/104/house__location__home__map__Pin-512.png",
+  const destinationIcon = {
+    url: "https://cdn-icons-png.flaticon.com/512/10049/10049568.png",
     scaledSize: { width: 50, height: 50 },
   };
 
-  const destinationIcon = {
+  const pickupIcon = {
     url: "https://cdn-icons-png.flaticon.com/512/76/76865.png",
     scaledSize: { width: 50, height: 50 },
+  };
+
+  const stopIcon = {
+    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Red_dot.svg/1024px-Red_dot.svg.png",
+    scaledSize: { width: 20, height: 20 },
   };
 
   return (
@@ -125,12 +133,26 @@ export default function Home() {
             </h1>
           </div>
           {/* Pickup Section */}
-          {priceMap.map(item=>{
+          {vehicleTypeList.length > 0 && vehicleTypeList.map(item=>{
             return (
-              <button>{item.vehicleType}</button>
+              <button onClick={()=> setSelectedVehicle(item)}>{item.vehicleType}</button>
             )
           })}
           <div className="mb-6 flex justify-center flex-col relative">
+            <div className="flex justify-between items-center">
+              <label
+                htmlFor="pickup"
+                className=" font-mono pb-1 text-gray-500 antialiased font-semibold line-clamp-1"
+              >
+                Pickup Address
+              </label>
+              <img
+                src={pickupIcon.url}
+                alt="Pickup Icon"
+                width={25}
+                height={25}
+              />
+            </div>
             <input
               ref={pickInputRef}
               value={pickInputAddress}
@@ -177,9 +199,25 @@ export default function Home() {
           </div>
           {/* Destination Section */}
           <div className="mb-6 flex justify-center flex-col relative">
+            <div className="flex justify-between items-center">
+              <label
+                htmlFor="pickup"
+                className=" font-mono pb-1 text-gray-500 antialiased font-semibold line-clamp-1"
+              >
+                Destination Address
+              </label>
+              <img
+                src={destinationIcon.url}
+                alt="Pickup Icon"
+                width={25}
+                height={25}
+              />
+            </div>
             <input
               value={destinationInputAddress}
-              onBlur={() => !isSelectionOngoing && setDestinationOpen(false)}
+              onBlur={() => {
+                !isSelectionOngoing && setDestinationOpen(false);
+              }}
               onChange={(e) => generateDestinationPlaces(e.target.value)}
               type="text"
               id="default-input"
@@ -218,7 +256,17 @@ export default function Home() {
            <button onClick={()=>setStopPosition(stopPosition.lat  ? {} : currentDestinationPos)}>{stopPosition.lat ? 'Remove Stop' : 'Add Stop'}</button> 
           </div>
 
+          {(getDistance(currentInputPos, currentDestinationPos)/1000 )*selectedVehicle.pricePerKm}
         </div>
+        <button
+          type="button"
+          class="px-3 py-2 text-sm font-medium text-center inline-flex items-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
+          onClick={() =>
+            setStopPosition(stopPosition.lat ? {} : currentDestinationPos)
+          }
+        >
+          {stopPosition.lat ? "Remove Stop" : "Add Stop"}
+        </button>
       </div>
       <div className="w-3/5 p-4">
         <p className="text-1xl text-center text-gray-500 antialiased font-semibold">
@@ -245,11 +293,10 @@ export default function Home() {
             >
               {stopPosition.lat && (
                 <MarkerF
-                // onDragEnd={changePickUAddress}
-                draggable={true}
-                position={stopPosition}
-                icon={pickupIcon}
-              />
+                  draggable={true}
+                  position={stopPosition}
+                  icon={stopIcon}
+                />
               )}
               <MarkerF
                 onDragEnd={changePickUpAddress}
