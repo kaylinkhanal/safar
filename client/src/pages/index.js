@@ -19,6 +19,7 @@ export default function Home() {
   });
   const pickInputRef = useRef(null);
   const [zoom, setZoom] = useState(13);
+  const [priceChangeCount, setPriceChangeCount]= useState(0)
   const [isSelectionOngoing, setIsSelectionOngoing] = useState(false);
   const [pickInputAddress, setPickInputAddress] = useState("");
   const [destinationInputAddress, setDestinationInputAddress] = useState("");
@@ -121,7 +122,8 @@ export default function Home() {
     url: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Red_dot.svg/1024px-Red_dot.svg.png",
     scaledSize: { width: 20, height: 20 },
   };
-
+  const estPrice =(getDistance(currentInputPos, currentDestinationPos)/1000 )*selectedVehicle.pricePerKm
+  const [finalPrice,setFinalPrice]= useState(0) 
   return (
     <main className={"min-h-screen dark:bg-[#37304E] flex"}>
       <div className="w-2/5 p-4 bg-gray-200 dark:bg-gray-800">
@@ -255,8 +257,19 @@ export default function Home() {
             )}
            <button onClick={()=>setStopPosition(stopPosition.lat  ? {} : currentDestinationPos)}>{stopPosition.lat ? 'Remove Stop' : 'Add Stop'}</button> 
           </div>
-
-          {(getDistance(currentInputPos, currentDestinationPos)/1000 )*selectedVehicle.pricePerKm}
+          <button
+            onClick={()=> setFinalPrice(finalPrice ? finalPrice + priceChangeCount :estPrice+priceChangeCount)}
+          className="bg-red-500 w-10 m-2">
+              +
+          </button>
+          <input value={priceChangeCount} onChange={(e)=>setPriceChangeCount(Number(e.target.value))}/>
+          <button className="bg-red-500 w-10 m-2">
+              -
+          </button>
+         Estimated price: {estPrice}
+         Final price: {finalPrice || estPrice}
+         
+          <button>-</button>
         </div>
         <button
           type="button"
