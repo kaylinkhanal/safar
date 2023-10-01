@@ -17,7 +17,7 @@ const updateVehicleInfo = async (req, res) => {
 };
 
 const deleteVehicleInfo = async (req, res) => {
-  const data = await Vehicle.findByIdAndDelete(req.params.id, req.body);
+  const data = await Vehicle.findByIdAndDelete(req.params.id);
   if (data) {
     res.json({
       msg: "Vehicle details deleted",

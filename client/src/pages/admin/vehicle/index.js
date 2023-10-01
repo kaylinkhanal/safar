@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
+import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 
 function allVehicles() {
+  const { vehicleDetails } = useSelector((state) => state.vehicle);
   const router = useRouter();
   const [vehicleList, setVehicleList] = useState([]);
 
@@ -41,22 +44,34 @@ function allVehicles() {
                 <th className="p-3 text-sm font-semibold tracking-wide text-left">
                   Base Price
                 </th>
+                <th className="p-3 text-sm font-semibold tracking-wide text-left">
+                  Actions
+                </th>
               </tr>
             </thead>
             {vehicleList.map((item) => (
-              <tbody className="divide-y divide-gray-100" key={item._id}>
+              <tbody className="divide-y m-5 divide-gray-100" key={item._id}>
                 <tr className="bg-white">
-                  <td className="p-3 text-sm w-8 text-gray-700 whitespace-nowrap">
+                  <td className="p-3 m-5 text-sm w-8 text-gray-700 ">
                     <img src={item.iconUrl} alt="vehicle icon" />
                   </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                  <td className="p-3 m-5 text-sm text-gray-700 ">
                     {item.vehicleType}
                   </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                  <td className="p-3 m-5 text-sm text-gray-700 ">
                     {item.pricePerKm}
                   </td>
-                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                  <td className="p-3 m-5 text-sm text-gray-700 ">
                     {item.basePrice}
+                  </td>
+                  <td className="p-3 m-5 text-sm text-gray-700 ">
+                    <EditIcon
+                      onClick={() =>
+                        router.push(`/admin/vehicle/edit/${item._id}`)
+                      }
+                      className=" cursor-pointer m-3"
+                    />
+                    <DeleteIcon className=" cursor-pointer m-3" />
                   </td>
                 </tr>
               </tbody>

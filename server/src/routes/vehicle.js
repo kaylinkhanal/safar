@@ -1,4 +1,4 @@
-const Vehicle = require("../models/user");
+const Vehicle = require("../models/vehicle");
 const express = require("express");
 const router = express.Router();
 const VehicleController = require("../controllers/vehicle");
