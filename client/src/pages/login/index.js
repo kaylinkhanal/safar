@@ -28,7 +28,11 @@ const Login = () => {
     const data = await res.json();
     if (data.isLoggedIn) {
       dispatch(setLoginDetails(data));
-      router.push("/");
+      if (data.userInfo.role == "Admin") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/");
+      }
     }
 
     toast({
