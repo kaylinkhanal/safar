@@ -439,10 +439,8 @@ export default function Home() {
             >
               {stopPosition.lat && (
                 <MarkerF
-                  onDragEnd={changeStopAddress}
                   draggable={true}
                   position={stopPosition}
-                  icon={stopIcon}
                 />
               )}
               <MarkerF
