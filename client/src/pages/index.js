@@ -246,60 +246,6 @@ export default function Home() {
       <div className="w-2/5 p-4 bg-gray-200 dark:bg-gray-800">
         {/* Enter desitination and pickup  */}
         <div className="flex flex-col justify-center mt-8 w-full h-22 relative">
-          <div className="flex justify-center text-white m-3 p-3">
-            {selectBike ? (
-              <div
-                className={`p-4   ${styles1.vehicleSelected}`}
-                onClick={() => {
-                  handleBikeFare(), VehicleType();
-                }}
-              >
-                <TwoWheelerIcon theme={theme} />
-              </div>
-            ) : (
-              <div
-                className={`p-4   ${styles1.vehicleIcon}`}
-                onClick={() => {
-                  handleBikeFare();
-                  if (!vehicleFare) {
-                    VehicleType();
-                  }
-                }}
-              >
-                <TwoWheelerIcon theme={theme} />
-              </div>
-            )}
-            {selectCar ? (
-              <div
-                className={`p-4   ${styles1.vehicleSelected}`}
-                onClick={() => {
-                  handleCarFare();
-                  if (!vehicleFare) {
-                    VehicleType();
-                  }
-                }}
-              >
-                <LocalTaxiIcon theme={theme} />
-              </div>
-            ) : (
-              <div
-                className={`p-4   ${styles1.vehicleIcon}`}
-                onClick={() => {
-                  handleCarFare();
-                  if (!vehicleFare) {
-                    VehicleType();
-                  }
-                }}
-              >
-                <LocalTaxiIcon theme={theme} />
-              </div>
-            )}
-          </div>
-          <div className="flex justify-center items-center flex-col">
-            <h1 className="font-mono pb-5 text-gray-500 antialiased font-semibold line-clamp-1">
-              Share the ride
-            </h1>
-          </div>
           {/* Icons Section */}
           <div className="flex mb-2 items-center justify-center">
             {vehicleTypeList.length > 0 &&
@@ -570,30 +516,6 @@ export default function Home() {
             </button>
           )}
         </div>
-        {selectBike && currentDestinationPos?.lat && (
-          <div className="text-white center text-xl flex justify-evenly mt-20 text-center p-5 content-center">
-            <div className="bg-gray-400 p-10 text-black">
-              <h1>Your Total Fare:</h1>
-              Rs. {vehicleFare[0].bikeFare}
-            </div>
-            <div>
-              <h1>Your Total Distance:</h1>
-              10000 m
-            </div>
-          </div>
-        )}
-        {selectCar && currentDestinationPos?.lat && (
-          <div className="text-white center text-xl flex justify-evenly mt-20 text-center p-5 content-center">
-            <div className="bg-gray-400 p-10 text-black">
-              <h1>Your Total Fare:</h1>
-              Rs. {vehicleFare[1].carFare}
-            </div>
-            <div>
-              <h1>Your Total Distance:</h1>
-              1000 m
-            </div>
-          </div>
-        )}
       </div>
       <div className="w-3/5 p-4">
         <CustomModal
