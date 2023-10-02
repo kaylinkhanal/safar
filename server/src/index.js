@@ -6,15 +6,13 @@ app.use(express.json());
 app.use(cors());
 const connect = require("./db/connect");
 const UserRoute = require("./routes/user");
-const ProductRoute = require("./routes/product");
-const VehicleRoute = require("./routes/vehicleFare");
+const VehicleRoute = require("./routes/vehicle");
 
 connect();
 
 const port = process.env.PORT || 3005;
 
 app.use(UserRoute);
-app.use(ProductRoute);
 app.use(VehicleRoute);
 
 app.listen(port, () => {
