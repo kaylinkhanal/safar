@@ -6,7 +6,7 @@ function allVehicles() {
   const [vehicleList, setVehicleList] = useState([]);
 
   const fetchVehicleList = async (values) => {
-    const res = await fetch("http://localhost:3005/getVehicles");
+    const res = await fetch("http://localhost:3005/vehicles");
     const data = await res.json();
     setVehicleList(data);
   };
@@ -29,23 +29,34 @@ function allVehicles() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b-2 border-gray-200">
               <tr>
+                <th className="p-3 text-sm font-semibold tracking-wide text-left">
+                  Icon
+                </th>
                 <th className="p-3 text-sm font-semibold text-left">
                   Vehicle Type
                 </th>
                 <th className="p-3 text-sm font-semibold tracking-wide text-left">
                   Price Per Km
                 </th>
+                <th className="p-3 text-sm font-semibold tracking-wide text-left">
+                  Base Price
+                </th>
               </tr>
             </thead>
             {vehicleList.map((item) => (
               <tbody className="divide-y divide-gray-100" key={item._id}>
                 <tr className="bg-white">
+                  <td className="p-3 text-sm w-8 text-gray-700 whitespace-nowrap">
+                    <img src={item.iconUrl} alt="vehicle icon" />
+                  </td>
                   <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
                     {item.vehicleType}
                   </td>
-
                   <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
                     {item.pricePerKm}
+                  </td>
+                  <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                    {item.basePrice}
                   </td>
                 </tr>
               </tbody>
