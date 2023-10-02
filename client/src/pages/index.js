@@ -7,9 +7,40 @@ import {
 } from "@react-google-maps/api";
 import styles from "../styles/map.module.css";
 import { getDistance } from "geolib";
+import {useSelector} from 'react-redux'
 import Image from "next/image";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  useDisclosure,
+  Button,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from "@chakra-ui/react";
 
+const CustomModal =(props)=>{
+  return (
+    <Modal isOpen={props.isOpen} onClose={()=> {props.onClose()
+      props.setPhoneInput('')
+    } }>
+    <ModalOverlay />
+    <ModalContent>
+      <ModalHeader>Enter Your Phone Number</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>
+       <input onChange={(e)=>props.setPhoneInput(e.target.value)} placeholder="enter Your phone number"/>
+      </ModalBody>
+    <button onClick={()=>props.onClose()}>Save</button>
+    </ModalContent>
+  </Modal>
+  )
+}
 export default function Home() {
+  const {isLoggedIn, userDetails} = useSelector(state=>state.user)
+  const [phoneInput, setPhoneInput] = useState('')
   const [currentInputPos, setCurrentInputPos] = useState({
     lat: 27.700769,
     lng: 85.30014,
@@ -39,6 +70,7 @@ export default function Home() {
     googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
     libraries: ["places"],
   });
+  const [phoneValidationOpen, setPhoneValidationOpen]= useState(false)
   const getVehicleType = async (values) => {
     const res = await fetch("http://localhost:3005/vehicles/", {
       method: "GET",
@@ -185,6 +217,23 @@ export default function Home() {
   };
 
   const [finalPrice, setFinalPrice] = useState(0);
+
+  const  handleSubmitRequest =()=>{
+    const rideDetails = {
+      phoneNumber: phoneInput,
+      currentInputPos,
+      currentDestinationPos,
+      priceChangeCount,
+      pickInputAddress,
+      destinationInputAddress,
+      stopInputAddress,
+      stopPosition,
+      selectedVehicle,
+      estimatedPrice: calculateEstPrice(),
+      userDetails:userDetails
+    }
+    console.log(rideDetails)
+  }
   return (
     <main className={"min-h-screen dark:bg-[#37304E] flex"}>
       <div className="w-2/5 p-4 bg-gray-200 dark:bg-gray-800">
@@ -431,9 +480,29 @@ export default function Home() {
                 </div>
               )}
           </div>
+
+          {isLoggedIn || phoneInput ? (
+          <button
+            onClick={()=>handleSubmitRequest()}
+            type="button"
+            className="px-3 mt-4 mb-4 py-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
+            >Sumbit Request</button>
+          )
+            :
+            (
+            <button
+            onClick={()=>setPhoneValidationOpen(true)}
+            type="button"
+            className="px-3 mt-4 mb-4 py-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
+            >Enter Your Details</button>
+            )
+          }
+         
         </div>
+ 
       </div>
       <div className="w-3/5 p-4">
+      <CustomModal isOpen={phoneValidationOpen} onClose={()=>setPhoneValidationOpen(false)} setPhoneInput={setPhoneInput}/>
         <p className="text-1xl text-center text-gray-500 antialiased font-semibold">
           Safar is a safe and reliable ride sharing application based in Nepal.
         </p>
