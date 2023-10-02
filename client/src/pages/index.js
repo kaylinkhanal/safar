@@ -18,10 +18,6 @@ export default function Home() {
     lat: 27.700769,
     lng: 85.30014,
   });
-  const [currentStopPos, setCurrentStopPos] = useState({
-    lat: 27.700769,
-    lng: 85.30014,
-  });
 
   const pickInputRef = useRef(null);
   const [zoom, setZoom] = useState(13);
@@ -105,7 +101,7 @@ export default function Home() {
   };
 
   const changeStopAddress = async (e) => {
-    setCurrentStopPos({
+    setStopPosition({
       lat: e.latLng.lat(),
       lng: e.latLng.lng(),
     });
@@ -158,10 +154,35 @@ export default function Home() {
     scaledSize: { width: 20, height: 20 },
   };
 
-  const estPrice = Math.ceil(
-    (getDistance(currentInputPos, currentDestinationPos) / 1000) *
-      selectedVehicle.pricePerKm
-  );
+  const calculateEstPrice = () => {
+    const distanceToDestination =
+      getDistance(currentInputPos, currentDestinationPos) / 1000;
+
+    let estPriceCalculated;
+
+    if (stopPosition.lat) {
+      const distanceToStop = getDistance(currentInputPos, stopPosition) / 1000;
+
+      const distanceFromStopToDestination =
+        getDistance(stopPosition, currentDestinationPos) / 1000;
+
+      const totalDistance = distanceToStop + distanceFromStopToDestination;
+
+      estPriceCalculated = Math.ceil(
+        totalDistance * selectedVehicle.pricePerKm
+      );
+    } else {
+      estPriceCalculated = Math.ceil(
+        distanceToDestination * selectedVehicle.pricePerKm
+      );
+    }
+
+    const basePrice = selectedVehicle.basePrice;
+
+    const estPriceFinal = Math.max(basePrice, estPriceCalculated);
+
+    return estPriceFinal;
+  };
 
   const [finalPrice, setFinalPrice] = useState(0);
   return (
@@ -306,10 +327,8 @@ export default function Home() {
               type="button"
               className="px-3 mt-4 mb-4 py-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
               onClick={() => {
-                // Toggle the stopPosition state when the button is clicked
                 setStopPosition(stopPosition.lat ? {} : currentDestinationPos);
 
-                // Show/hide the stop input field based on the stopPosition state
                 setStopInputVisible(!stopPosition.lat);
               }}
             >
@@ -349,7 +368,7 @@ export default function Home() {
                     return (
                       <div
                         onClick={() => {
-                          setCurrentStopPos({
+                          setStopPosition({
                             lat: item.lat,
                             lng: item.lon,
                           });
@@ -374,15 +393,15 @@ export default function Home() {
               pickInputAddress &&
               destinationInputAddress && (
                 <div>
-                  <div>Estimated price: Rs {estPrice}</div>
-                  <div>Final price: Rs {finalPrice || estPrice}</div>
+                  <div>Estimated price: Rs {calculateEstPrice()}</div>
+                  <div>Final price: Rs {finalPrice || calculateEstPrice()}</div>
                   <div className="flex items-center">
                     <button
                       onClick={() =>
                         setFinalPrice(
                           finalPrice
                             ? finalPrice - priceChangeCount
-                            : estPrice - priceChangeCount
+                            : calculateEstPrice() - priceChangeCount
                         )
                       }
                       className="p-3 m-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
@@ -401,7 +420,7 @@ export default function Home() {
                         setFinalPrice(
                           finalPrice
                             ? finalPrice + priceChangeCount
-                            : estPrice + priceChangeCount
+                            : calculateEstPrice() + priceChangeCount
                         )
                       }
                       className="p-3 m-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
