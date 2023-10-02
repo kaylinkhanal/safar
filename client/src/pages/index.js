@@ -459,11 +459,19 @@ export default function Home() {
                           finalPrice - priceChangeCount >=
                             selectedVehicle.basePrice
                         ) {
+                          return setFinalPrice(finalPrice - priceChangeCount);
+                        } else if (
+                          !finalPrice &&
+                          calculateEstPrice() - priceChangeCount >=
+                            selectedVehicle.basePrice
+                        ) {
                           return setFinalPrice(
-                            finalPrice - priceChangeCount ||
-                              calculateEstPrice() - priceChangeCount
+                            calculateEstPrice() - priceChangeCount
                           );
-                        } else {
+                        } else if (
+                          finalPrice - priceChangeCount <=
+                          selectedVehicle.basePrice
+                        ) {
                           return setFinalPrice(selectedVehicle.basePrice);
                         }
                       }}
