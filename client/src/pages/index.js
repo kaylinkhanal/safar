@@ -453,27 +453,20 @@ export default function Home() {
                   <div>Final price: Rs {finalPrice || calculateEstPrice()}</div>
                   <div className="flex items-center">
                     <button
-                      onClick={() =>
-                        // setFinalPrice(
-                        //   finalPrice && finalPrice >= selectedVehicle.basePrice
-                        //     ? finalPrice - priceChangeCount
-                        //     : calculateEstPrice() - priceChangeCount
-                        // )
-                        {
-                          if (
-                            finalPrice &&
-                            finalPrice - priceChangeCount >=
-                              selectedVehicle.basePrice
-                          ) {
-                            return setFinalPrice(
-                              finalPrice - priceChangeCount ||
-                                calculateEstPrice() - priceChangeCount
-                            );
-                          } else {
-                            return setFinalPrice(selectedVehicle.basePrice);
-                          }
+                      onClick={() => {
+                        if (
+                          finalPrice &&
+                          finalPrice - priceChangeCount >=
+                            selectedVehicle.basePrice
+                        ) {
+                          return setFinalPrice(
+                            finalPrice - priceChangeCount ||
+                              calculateEstPrice() - priceChangeCount
+                          );
+                        } else {
+                          return setFinalPrice(selectedVehicle.basePrice);
                         }
-                      }
+                      }}
                       className="p-3 m-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
                     >
                       -
