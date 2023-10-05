@@ -15,10 +15,14 @@ app.use(cors());
 const connect = require("./db/connect");
 const UserRoute = require("./routes/user");
 const VehicleRoute = require("./routes/vehicle");
-
+const Rides = require("./models/rides")
 connect();
 io.on('connection', (socket) => {
-  console.log('a user connected');
+
+  socket.on('rides', (rides)=>{
+    io.emit("rides", rides);
+  })
+
 });
 const port = process.env.PORT || 3005;
 
