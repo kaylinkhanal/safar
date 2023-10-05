@@ -21,6 +21,8 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 
+import { io } from "socket.io-client";
+const socket = io("http://localhost:3005");
 const CustomModal = (props) => {
   return (
     <Modal
@@ -46,6 +48,9 @@ const CustomModal = (props) => {
   );
 };
 export default function Home() {
+  useEffect(()=>{
+    socket.on('connection')
+  },[])
   const { isLoggedIn, userDetails } = useSelector((state) => state.user);
   const [phoneInput, setPhoneInput] = useState("");
   const [currentInputPos, setCurrentInputPos] = useState({
