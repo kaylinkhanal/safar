@@ -8,7 +8,44 @@ import {
 import styles from "../styles/map.module.css";
 import { getDistance } from "geolib";
 import Image from "next/image";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  useDisclosure,
+  Button,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from "@chakra-ui/react";
 
+import { io } from "socket.io-client";
+const socket = io("http://localhost:3005");
+const CustomModal = (props) => {
+  return (
+    <Modal
+      isOpen={props.isOpen}
+      onClose={() => {
+        props.onClose();
+        props.setPhoneInput("");
+      }}
+    >
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Enter Your Phone Number</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <input
+            onChange={(e) => props.setPhoneInput(e.target.value)}
+            placeholder="enter Your phone number"
+          />
+        </ModalBody>
+        <button onClick={() => props.onClose()}>Save</button>
+      </ModalContent>
+    </Modal>
+  );
+};
 export default function Home() {
   const [currentInputPos, setCurrentInputPos] = useState({
     lat: 27.700769,
@@ -387,7 +424,7 @@ export default function Home() {
               </div>
             )}
           </div>
-          <div>
+          <div className="text-white">
             {/* Estimated Section */}
             {Object.keys(selectedVehicle).length > 0 &&
               pickInputAddress &&

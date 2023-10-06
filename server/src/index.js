@@ -9,6 +9,11 @@ const UserRoute = require("./routes/user");
 const VehicleRoute = require("./routes/vehicle");
 
 connect();
+io.on('connection', (socket) => {
+
+  socket.on('rides', (rides)=>{
+    io.emit("rides", rides);
+  })
 
 const port = process.env.PORT || 3005;
 
