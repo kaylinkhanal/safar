@@ -19,8 +19,10 @@ const Rides = require("./models/rides")
 connect();
 io.on('connection', (socket) => {
 
-  socket.on('rides', (rides)=>{
-    io.emit("rides", rides);
+  socket.on('rides', async(rides)=>{
+    await  Rides.create(rides)
+    const data = await Rides.find({status: 'pending'})
+    io.emit("rides", data);
   })
 
 });

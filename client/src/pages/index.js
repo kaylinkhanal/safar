@@ -243,6 +243,7 @@ export default function Home() {
       selectedVehicleId: selectedVehicle._id,
       estimatedPrice: calculateEstPrice(),
       userDetails: userDetails,
+      finalPrice
     };
     socket.emit('rides',rideDetails )
   };
