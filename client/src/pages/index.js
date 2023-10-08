@@ -83,6 +83,7 @@ export default function Home() {
     libraries: ["places"],
   });
   const [phoneValidationOpen, setPhoneValidationOpen] = useState(false);
+  
   const getVehicleType = async (values) => {
     const res = await fetch("http://localhost:3005/vehicles/", {
       method: "GET",
