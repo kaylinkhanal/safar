@@ -34,23 +34,32 @@ const CustomModal = (props) => {
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Enter Your Phone Number</ModalHeader>
+        <ModalHeader className="flex text-center justify-center">
+          Enter Your Phone Number
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <input
             onChange={(e) => props.setPhoneInput(e.target.value)}
-            placeholder="enter Your phone number"
+            placeholder="Enter your phone number"
+            className="w-full h-12"
           />
         </ModalBody>
-        <button onClick={() => props.onClose()}>Save</button>
+        <button
+          onClick={() => props.onClose()}
+          className="p-2 m-6
+        text-white bg-[#37304E] rounded-lg hover:bg-red-800"
+        >
+          Save
+        </button>
       </ModalContent>
     </Modal>
   );
 };
 export default function Home() {
-  useEffect(()=>{
-    socket.on('connection')
-  },[])
+  useEffect(() => {
+    socket.on("connection");
+  }, []);
   const { isLoggedIn, userDetails } = useSelector((state) => state.user);
   const [phoneInput, setPhoneInput] = useState("");
   const [currentInputPos, setCurrentInputPos] = useState({
@@ -69,6 +78,9 @@ export default function Home() {
   const [pickInputAddress, setPickInputAddress] = useState("");
   const [destinationInputAddress, setDestinationInputAddress] = useState("");
   const [stopInputAddress, setStopInputAddress] = useState("");
+  const [pickUpForRider, setPickUpForRider] = useState({});
+  const [destForRider, setDestForRider] = useState({});
+  const [stopForRider, setStopForRider] = useState({});
   const [pickUpOpen, setPickUpOpen] = useState(false);
   const [destinationOpen, setDestinationOpen] = useState(false);
   const [stopOpen, setStopOpen] = useState(false);
@@ -78,6 +90,7 @@ export default function Home() {
   const [stopPosition, setStopPosition] = useState({});
   const [vehicleTypeList, setVehiclesTypeList] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState({});
+  const [finalPrice, setFinalPrice] = useState("");
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
     libraries: ["places"],
@@ -123,8 +136,10 @@ export default function Home() {
       `https://api.geoapify.com/v1/geocode/reverse?lat=${e.latLng.lat()}&lon=${e.latLng.lng()}&apiKey=a1dd45a7dfc54f55a44b69d125722fcb`
     );
     const data = await res.json();
+
     if (data) {
       setPickInputAddress(data.features[0].properties.formatted);
+      setPickUpForRider(data.features[0].properties);
       setZoom(14);
     }
   };
@@ -141,6 +156,7 @@ export default function Home() {
     const data = await res.json();
     if (data) {
       setDestinationInputAddress(data.features[0].properties.formatted);
+      setDestForRider(data.features[0].properties);
     }
   };
 
@@ -154,8 +170,10 @@ export default function Home() {
       `https://api.geoapify.com/v1/geocode/reverse?lat=${e.latLng.lat()}&lon=${e.latLng.lng()}&apiKey=a1dd45a7dfc54f55a44b69d125722fcb`
     );
     const data = await res.json();
+
     if (data) {
       setStopInputAddress(data.features[0].properties.formatted);
+      setStopForRider(data.features[0].properties);
     }
   };
 
@@ -228,8 +246,6 @@ export default function Home() {
     return estPriceFinal;
   };
 
-  const [finalPrice, setFinalPrice] = useState(0);
-
   const handleSubmitRequest = () => {
     const rideDetails = {
       phoneNumber: phoneInput,
@@ -237,25 +253,24 @@ export default function Home() {
       currentDestinationPos,
       priceChangeCount,
       pickInputAddress,
+      pickUpForRider,
+      destForRider,
+      stopForRider,
       destinationInputAddress,
       stopInputAddress,
       stopPosition,
       selectedVehicleId: selectedVehicle._id,
       estimatedPrice: calculateEstPrice(),
+      finalPrice: finalPrice || calculateEstPrice(),
       userDetails: userDetails,
     };
-    socket.emit('rides',rideDetails )
+    socket.emit("rides", rideDetails);
   };
   return (
-    <main className={"min-h-screen dark:bg-[#37304E] flex"}>
+    <main className="dark:bg-[#37304E] flex">
       <div className="w-2/5 p-4 bg-gray-200 dark:bg-gray-800">
         {/* Enter desitination and pickup  */}
         <div className="flex flex-col justify-center mt-8 w-full h-22 relative">
-          <div className="flex justify-center items-center flex-col">
-            <h1 className="font-mono pb-5 text-gray-500 antialiased font-semibold line-clamp-1">
-              Share the ride
-            </h1>
-          </div>
           {/* Icons Section */}
           <div className="flex mb-2 items-center justify-center">
             {vehicleTypeList.length > 0 &&
@@ -448,14 +463,24 @@ export default function Home() {
               </div>
             )}
           </div>
-          <div className="text-white">
+          <div className="text-[#37304E]">
             {/* Estimated Section */}
             {Object.keys(selectedVehicle).length > 0 &&
               pickInputAddress &&
               destinationInputAddress && (
                 <div>
-                  <div>Estimated price: Rs {calculateEstPrice()}</div>
-                  <div>Final price: Rs {finalPrice || calculateEstPrice()}</div>
+                  <div className="flex">
+                    <h1>Estimated price :</h1>
+                    <p className="font-bold"> Rs{calculateEstPrice()}</p>
+                  </div>
+                  <div className="flex">
+                    <h1>Final price :</h1>
+                    <p className="font-bold">
+                      {" "}
+                      Rs{finalPrice || calculateEstPrice()}
+                    </p>
+                  </div>
+
                   <div className="flex items-center">
                     <button
                       onClick={() => {
@@ -504,27 +529,26 @@ export default function Home() {
                       +
                     </button>
                   </div>
+                  {isLoggedIn || phoneInput ? (
+                    <button
+                      onClick={() => handleSubmitRequest()}
+                      type="button"
+                      className="p-3 w-full my-4 text-center text-white bg-[#37304E] rounded-lg hover:bg-red-800"
+                    >
+                      Submit Request
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setPhoneValidationOpen(true)}
+                      type="button"
+                      className="p-3 w-full my-4 text-center text-white bg-[#37304E] rounded-lg hover:bg-red-800"
+                    >
+                      Enter Your Details
+                    </button>
+                  )}
                 </div>
               )}
           </div>
-
-          {isLoggedIn || phoneInput ? (
-            <button
-              onClick={() => handleSubmitRequest()}
-              type="button"
-              className="px-3 mt-4 mb-4 py-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
-            >
-              Submit Request
-            </button>
-          ) : (
-            <button
-              onClick={() => setPhoneValidationOpen(true)}
-              type="button"
-              className="px-3 mt-4 mb-4 py-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
-            >
-              Enter Your Details
-            </button>
-          )}
         </div>
       </div>
       <div className="w-3/5 p-4">
@@ -533,9 +557,7 @@ export default function Home() {
           onClose={() => setPhoneValidationOpen(false)}
           setPhoneInput={setPhoneInput}
         />
-        <p className="text-1xl text-center text-gray-500 antialiased font-semibold">
-          Safar is a safe and reliable ride sharing application based in Nepal.
-        </p>
+
         {/* google map  */}
         <div className="flex justify-center p-2 mt-2">
           {isLoaded && (
