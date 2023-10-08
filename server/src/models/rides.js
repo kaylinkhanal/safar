@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const ridesSchema = new mongoose.Schema({
-  user: mongoose.Schema.Types.ObjectId,
+  user:{type: mongoose.Schema.Types.ObjectId , ref:'User'},
   estimatedPrice: { type: Number },
   finalPrice: { type: Number },
   password: String,
@@ -22,6 +22,8 @@ const ridesSchema = new mongoose.Schema({
   currentDestinationPos: Object,
   stopPosition: Object,
   phoneNumber: String,
+},{
+  timestamps: true
 });
 
 const Rides = mongoose.model("Rides", ridesSchema);

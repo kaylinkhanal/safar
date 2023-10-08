@@ -5,6 +5,7 @@ import {
   Autocomplete,
   useJsApiLoader,
 } from "@react-google-maps/api";
+import Map from "../components/Map"
 import styles from "../styles/map.module.css";
 import { getDistance } from "geolib";
 import { useSelector } from "react-redux";
@@ -201,20 +202,7 @@ export default function Home() {
     }
   };
 
-  const destinationIcon = {
-    url: "https://cdn-icons-png.flaticon.com/512/10049/10049568.png",
-    scaledSize: { width: 50, height: 50 },
-  };
 
-  const pickupIcon = {
-    url: "https://cdn-icons-png.flaticon.com/512/76/76865.png",
-    scaledSize: { width: 50, height: 50 },
-  };
-
-  const stopIcon = {
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Red_dot.svg/1024px-Red_dot.svg.png",
-    scaledSize: { width: 20, height: 20 },
-  };
 
   const calculateEstPrice = () => {
     const distanceToDestination =
@@ -262,7 +250,7 @@ export default function Home() {
       selectedVehicleId: selectedVehicle._id,
       estimatedPrice: calculateEstPrice(),
       finalPrice: finalPrice || calculateEstPrice(),
-      userDetails: userDetails,
+      user: userDetails._id,
     };
     socket.emit("rides", rideDetails);
   };
@@ -561,45 +549,16 @@ export default function Home() {
         {/* google map  */}
         <div className="flex justify-center p-2 mt-2">
           {isLoaded && (
-            <GoogleMap
-              id="circle-example"
-              mapContainerStyle={{
-                height: "400px",
-                width: "800px",
-              }}
-              zoom={zoom}
-              center={
-                currentInputPos.lat
-                  ? currentInputPos
-                  : {
-                      lat: 27.700769,
-                      lng: 85.30014,
-                    }
-              }
-            >
-              {stopPosition.lat && (
-                <MarkerF
-                  onDragEnd={changeStopAddress}
-                  draggable={true}
-                  position={stopPosition}
-                  icon={stopIcon}
-                />
-              )}
-              <MarkerF
-                onDragEnd={changePickUpAddress}
-                draggable={true}
-                position={currentInputPos}
-                icon={pickupIcon}
-              />
-
-              <MarkerF
-                onDragEnd={changeDestinationAddress}
-                draggable={true}
-                position={currentDestinationPos}
-                icon={destinationIcon}
-              />
-            </GoogleMap>
-          )}
+            <Map
+            currentInputPos={currentInputPos}
+             stopPosition = {stopPosition}
+            changeStopAddress = {changeStopAddress}
+            changePickUpAddress ={changePickUpAddress}
+            changeDestinationAddress = {changeDestinationAddress}
+            zoom = {zoom}
+            currentDestinationPos={currentDestinationPos}
+            />
+       )}
         </div>
       </div>
     </main>

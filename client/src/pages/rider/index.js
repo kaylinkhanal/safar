@@ -14,10 +14,12 @@ import {
   AccordionButton,
   AccordionPanel,
 } from "@chakra-ui/react";
+import Map from '../../components/Map'
 const socket = io("http://localhost:3005");
 
 function Rider() {
   const [availableRides, setAvailableRides] = useState([]);
+  const [selectedRideCard, setSelectedRideCard]= useState({})
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
     libraries: ["places"],
@@ -27,6 +29,7 @@ function Rider() {
 
   useEffect(() => {
     socket.on("rides", (rides) => {
+      console.log(rides)
       setAvailableRides(rides);
     });
   }, []);
@@ -39,29 +42,33 @@ function Rider() {
     <div className="flex">
       <div className="w-2/5 p-4 bg-gray-200">
         <Accordion allowToggle>
+ 
           {availableRides.length > 0 &&
             availableRides.map((item, index) => {
-              const isActive = activeJob === index;
+
               return (
                 <div
                   key={index}
                   className={`w-full p-3 mb-2 text-center text-[#37304E] bg-white rounded-lg shadow-lg ${
-                    isActive ? "bg-slate-200" : ""
+                    activeJob === index ? "bg-slate-200" : ""
                   }`}
                 >
+                  
                   <AccordionItem>
                     <AccordionButton
-                      onClick={() => handleAccordionItemClick(index)}
+                      onClick={() =>{ setActiveJob(index)
+                        setSelectedRideCard(item)
+                      }}
                     >
                       <Box as="span" flex="1">
                         <div className="flex items-center justify-between">
                           <div className="flex flex-col">
                             <h1 className="text-xs font-bold">
-                              {item.pickUpForRider.suburb ??
-                                item.pickUpForRider.address_line1}
+                              {item?.pickUpForRider?.suburb ??
+                                item?.pickUpForRider?.address_line1}
                             </h1>
                             <p className="text-xs text-left ">
-                              {item.pickUpForRider.county}
+                              {item.pickUpForRider?.county}
                             </p>
                           </div>
 
@@ -146,11 +153,11 @@ function Rider() {
 
                           <div className="flex flex-col">
                             <h1 className="text-xs font-bold ">
-                              {item.destForRider.suburb ??
-                                item.destForRider.address_line1}
+                              {item.destForRider?.suburb ??
+                                item.destForRider?.address_line1}
                             </h1>
                             <p className="text-xs text-left ">
-                              {item.destForRider.county}
+                              {item.destForRider?.county}
                             </p>
                           </div>
                         </div>
@@ -172,7 +179,7 @@ function Rider() {
                     <AccordionPanel className=" bg-slate-200" pb={4}>
                       <div className="flex text-center justify-center">
                         <h1>Customer Number :</h1>
-                        <p className="font-bold">{item.phoneNumber}</p>
+                        <p className="font-bold">{item.phoneNumber || item.user?.phoneNumber}</p>
                       </div>
                       <button
                         type="button"
@@ -191,19 +198,17 @@ function Rider() {
       {/* Map Section */}
       <div className="w-3/5 p-4">
         {isLoaded && (
-          <GoogleMap
-            id="circle-example"
-            mapContainerStyle={{
-              height: "400px",
-              width: "800px",
-            }}
-            zoom={zoom}
-            center={{
-              lat: 27.700769,
-              lng: 85.30014,
-            }}
-          ></GoogleMap>
-        )}
+         <Map
+         isRider = {true}
+         currentInputPos={selectedRideCard.currentInputPos}
+          stopPosition = {selectedRideCard.stopPosition}
+         changeStopAddress = {selectedRideCard.changeStopAddress}
+         changePickUpAddress ={selectedRideCard.changePickUpAddress}
+         changeDestinationAddress = {selectedRideCard.changeDestinationAddress}
+         zoom = {13}
+         currentDestinationPos={selectedRideCard.currentDestinationPos}
+         />
+       )}
       </div>
     </div>
   );

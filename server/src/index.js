@@ -21,7 +21,8 @@ io.on('connection', (socket) => {
 
   socket.on('rides', async(rides)=>{
     await Rides.create(rides)
-    const data = await Rides.find({status: "pending"})
+    const data = await Rides.find({status: "pending"}).populate('user')
+    console.log(data)
     io.emit("rides", data);
   })
 
