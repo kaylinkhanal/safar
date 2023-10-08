@@ -20,6 +20,8 @@ import {
   ModalBody,
   ModalCloseButton,
 } from "@chakra-ui/react";
+const { io } = require("socket.io-client");
+const socket = io("http://localhost:3005");
 
 const CustomModal = (props) => {
   return (
@@ -46,6 +48,9 @@ const CustomModal = (props) => {
   );
 };
 export default function Home() {
+  useEffect(() => {
+    socket.on("connection");
+  }, []);
   const { isLoggedIn, userDetails } = useSelector((state) => state.user);
   const [phoneInput, setPhoneInput] = useState("");
   const [currentInputPos, setCurrentInputPos] = useState({
@@ -235,11 +240,13 @@ export default function Home() {
       destinationInputAddress,
       stopInputAddress,
       stopPosition,
-      selectedVehicle,
+      selectedVehicleId: selectedVehicle._id,
       estimatedPrice: calculateEstPrice(),
       userDetails: userDetails,
+      image: item.iconUrl,
     };
     console.log(rideDetails);
+    socket.emit("rides", rideDetails);
   };
   return (
     <main className={"min-h-screen dark:bg-[#37304E] flex"}>

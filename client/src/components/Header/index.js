@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/redux/reducerSlices/userSlice";
 import { Button } from "@chakra-ui/react";
 import { Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
+import { BellIcon } from "@chakra-ui/icons";
 
 function NavBar() {
   const router = useRouter();
@@ -44,7 +45,9 @@ function NavBar() {
 
   // Call the fetchUserImage function to retrieve and set the user's image
   useEffect(() => {
-    fetchUserImage();
+    if (isLoggedIn) {
+      fetchUserImage();
+    }
   }, []);
 
   return (
@@ -74,7 +77,16 @@ function NavBar() {
         {!isLoggedIn ? (
           <>
             {/* Login-SignUp Button  */}
+
             <div className="flex justify-end w-1/3 mx-8">
+              <div className="mr-10  relative hover:bg-white">
+                <BellIcon
+                  boxSize={8}
+                  className="top-3 absolute right-0 "
+                  color="red"
+                />
+                <p className="absolute top-0 left-[-2] ">0</p>
+              </div>
               <div className="hover:bg-[#CD121F] rounded-l-full w-20 shadow-inner shadow-slate-900 text-center">
                 <button className="p-2" onClick={() => router.push("/login")}>
                   Login
