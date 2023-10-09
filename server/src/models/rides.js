@@ -20,6 +20,9 @@ const ridesSchema = new mongoose.Schema(
     currentInputPos: Object,
     currentDestinationPos: Object,
     stopPosition: Object,
+    pickInputAddress: Object,
+    destinationInputAddress: Object,
+    stopInputAddress: Object,
     phoneNumber: String,
   },
   {

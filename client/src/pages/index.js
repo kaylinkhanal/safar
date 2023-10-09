@@ -1,26 +1,18 @@
 import { useState, useEffect, useRef } from "react";
-import {
-  GoogleMap,
-  MarkerF,
-  Autocomplete,
-  useJsApiLoader,
-} from "@react-google-maps/api";
+import { useJsApiLoader } from "@react-google-maps/api";
 import Map from "../components/Map";
 import styles from "../styles/map.module.css";
 import { getDistance } from "geolib";
 import { useSelector } from "react-redux";
-import Image from "next/image";
 import {
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  useDisclosure,
-  Button,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
 } from "@chakra-ui/react";
+import { Card, Heading } from "@chakra-ui/react";
 
 import { io } from "socket.io-client";
 const socket = io("http://localhost:3005");
@@ -61,15 +53,15 @@ export default function Home() {
   useEffect(() => {
     socket.on("connection");
   }, []);
-  const [rideAcceptDetails, setRideAcceptDetails] = useState({})
+  const [rideAcceptDetails, setRideAcceptDetails] = useState({});
 
   const { isLoggedIn, userDetails } = useSelector((state) => state.user);
   useEffect(() => {
-    socket.on('acceptRide', (rideAcceptDetails)=>{
-      if(rideAcceptDetails.user == userDetails._id)
-      setRideAcceptDetails(rideAcceptDetails)
-    })
-  }, [socket])
+    socket.on("acceptRide", (rideAcceptDetails) => {
+      if (rideAcceptDetails.user == userDetails._id)
+        setRideAcceptDetails(rideAcceptDetails);
+    });
+  }, [socket]);
   const [phoneInput, setPhoneInput] = useState("");
   const [currentInputPos, setCurrentInputPos] = useState({
     lat: 27.700769,
@@ -82,7 +74,7 @@ export default function Home() {
 
   const pickInputRef = useRef(null);
   const [zoom, setZoom] = useState(13);
-  const [submittedReq, setSubmittedReq] = useState(false)
+  const [submittedReq, setSubmittedReq] = useState(false);
   const [priceChangeCount, setPriceChangeCount] = useState(10);
   const [isSelectionOngoing, setIsSelectionOngoing] = useState(false);
   const [pickInputAddress, setPickInputAddress] = useState("");
@@ -242,17 +234,17 @@ export default function Home() {
   };
 
   const handleSubmitRequest = () => {
-    setSubmittedReq(!submittedReq)
-    if(!submittedReq){
+    setSubmittedReq(!submittedReq);
+    if (!submittedReq) {
       const rideDetails = {
         phoneNumber: phoneInput,
         currentInputPos,
         currentDestinationPos,
         priceChangeCount,
-        pickInputAddress,
         pickUpForRider,
         destForRider,
         stopForRider,
+        pickInputAddress,
         destinationInputAddress,
         stopInputAddress,
         stopPosition,
@@ -262,14 +254,35 @@ export default function Home() {
         user: userDetails._id,
       };
       socket.emit("rides", rideDetails);
-    }else{
-      alert("your ride has been cancelled")
+    } else {
+      alert("your ride has been cancelled");
     }
-  
   };
   return (
     <main className="dark:bg-[#37304E] flex">
-      <div className="w-2/5 p-4 bg-gray-200 dark:bg-gray-800">
+      <div className="w-2/5 p-5 bg-gray-200 dark:bg-gray-800">
+        {/* Ride Accepted Card */}
+        {/* <div className="flex flex-col">
+          <Card className="p-5" align="center">
+            <Heading className="pb-3 text-[#37304E]" size="md">
+              Your Ride has been Accepted
+            </Heading>
+            <p className="text-xs">Rider Details</p>
+            <p className=" font-semibold text-[#37304E]">
+              Rider : {rideAcceptDetails?.rider?.fullName}
+            </p>
+            <p className=" font-semibold text-[#37304E]">
+              Number : {rideAcceptDetails?.rider?.phoneNumber}
+            </p>
+            <p className=" font-semibold text-[#37304E]">Vehicle No :</p>
+            <p>
+              Total Price to be Paid :{" "}
+              <strong>Rs{rideAcceptDetails?.finalPrice}</strong>
+            </p>
+            <p className="text-xs mt-5">Have a Safe and Happy Ride</p>
+          </Card>
+        </div> */}
+
         {/* Enter desitination and pickup  */}
         <div className="flex flex-col justify-center mt-8 w-full h-22 relative">
           {/* Icons Section */}
@@ -292,7 +305,7 @@ export default function Home() {
                 </div>
               ))}
           </div>
-                      {JSON.stringify(rideAcceptDetails)}
+
           {/* Pickup Section */}
           <div className="mb-6 flex justify-center flex-col relative">
             <div className="flex justify-between items-center">
@@ -543,7 +556,7 @@ export default function Home() {
                       type="button"
                       className="p-3 w-full my-4 text-center text-white bg-[#37304E] rounded-lg hover:bg-red-800"
                     >
-                    {submittedReq ? "Cancel Ride": "Submit Request"} 
+                      {submittedReq ? "Cancel Ride" : "Submit Request"}
                     </button>
                   ) : (
                     <button
@@ -556,10 +569,19 @@ export default function Home() {
                   )}
                 </div>
               )}
+            {/* Cancel Ride Button */}
+            {/* <button
+              onClick={() => handleSubmitRequest()}
+              type="button"
+              className="p-3 w-full my-4 text-center text-white bg-[#37304E] rounded-lg hover:bg-red-800"
+            >
+              {submittedReq && "Cancel Ride"}
+            </button> */}
           </div>
         </div>
       </div>
-      <div className="w-3/5 p-4">
+
+      <div className="w-3/5">
         <CustomModal
           isOpen={phoneValidationOpen}
           onClose={() => setPhoneValidationOpen(false)}
@@ -567,7 +589,7 @@ export default function Home() {
         />
 
         {/* google map  */}
-        <div className="flex justify-center p-2 mt-2">
+        <div className="">
           {isLoaded && (
             <Map
               currentInputPos={currentInputPos}
