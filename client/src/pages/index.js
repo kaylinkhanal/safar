@@ -61,7 +61,15 @@ export default function Home() {
   useEffect(() => {
     socket.on("connection");
   }, []);
+  const [rideAcceptDetails, setRideAcceptDetails] = useState({})
+
   const { isLoggedIn, userDetails } = useSelector((state) => state.user);
+  useEffect(() => {
+    socket.on('acceptRide', (rideAcceptDetails)=>{
+      if(rideAcceptDetails.user == userDetails._id)
+      setRideAcceptDetails(rideAcceptDetails)
+    })
+  }, [socket])
   const [phoneInput, setPhoneInput] = useState("");
   const [currentInputPos, setCurrentInputPos] = useState({
     lat: 27.700769,
@@ -74,6 +82,7 @@ export default function Home() {
 
   const pickInputRef = useRef(null);
   const [zoom, setZoom] = useState(13);
+  const [submittedReq, setSubmittedReq] = useState(false)
   const [priceChangeCount, setPriceChangeCount] = useState(10);
   const [isSelectionOngoing, setIsSelectionOngoing] = useState(false);
   const [pickInputAddress, setPickInputAddress] = useState("");
@@ -233,24 +242,30 @@ export default function Home() {
   };
 
   const handleSubmitRequest = () => {
-    const rideDetails = {
-      phoneNumber: phoneInput,
-      currentInputPos,
-      currentDestinationPos,
-      priceChangeCount,
-      pickInputAddress,
-      pickUpForRider,
-      destForRider,
-      stopForRider,
-      destinationInputAddress,
-      stopInputAddress,
-      stopPosition,
-      selectedVehicle,
-      estimatedPrice: calculateEstPrice(),
-      finalPrice: finalPrice || calculateEstPrice(),
-      user: userDetails._id,
-    };
-    socket.emit("rides", rideDetails);
+    setSubmittedReq(!submittedReq)
+    if(!submittedReq){
+      const rideDetails = {
+        phoneNumber: phoneInput,
+        currentInputPos,
+        currentDestinationPos,
+        priceChangeCount,
+        pickInputAddress,
+        pickUpForRider,
+        destForRider,
+        stopForRider,
+        destinationInputAddress,
+        stopInputAddress,
+        stopPosition,
+        selectedVehicle,
+        estimatedPrice: calculateEstPrice(),
+        finalPrice: finalPrice || calculateEstPrice(),
+        user: userDetails._id,
+      };
+      socket.emit("rides", rideDetails);
+    }else{
+      alert("your ride has been cancelled")
+    }
+  
   };
   return (
     <main className="dark:bg-[#37304E] flex">
@@ -277,7 +292,7 @@ export default function Home() {
                 </div>
               ))}
           </div>
-
+                      {JSON.stringify(rideAcceptDetails)}
           {/* Pickup Section */}
           <div className="mb-6 flex justify-center flex-col relative">
             <div className="flex justify-between items-center">
@@ -528,7 +543,7 @@ export default function Home() {
                       type="button"
                       className="p-3 w-full my-4 text-center text-white bg-[#37304E] rounded-lg hover:bg-red-800"
                     >
-                      Submit Request
+                    {submittedReq ? "Cancel Ride": "Submit Request"} 
                     </button>
                   ) : (
                     <button

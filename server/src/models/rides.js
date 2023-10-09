@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const ridesSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    rider: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     estimatedPrice: { type: Number },
     finalPrice: { type: Number },
     password: String,

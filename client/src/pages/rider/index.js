@@ -9,6 +9,7 @@ import {
   AccordionButton,
   AccordionPanel,
 } from "@chakra-ui/react";
+import {useSelector} from 'react-redux'
 import Map from "../../components/Map";
 const socket = io("http://localhost:3005");
 
@@ -19,7 +20,7 @@ function Rider() {
     googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
     libraries: ["places"],
   });
-
+  const {  userDetails } = useSelector((state) => state.user);
   const [activeJob, setActiveJob] = useState(null);
 
   useEffect(() => {
@@ -27,6 +28,10 @@ function Rider() {
       setAvailableRides(rides);
     });
   }, []);
+
+  const acceptRide =(rideId)=>{
+    socket.emit('acceptRide', {rideId, riderId:  userDetails._id})
+  }
 
   return (
     <div className="flex">
@@ -172,6 +177,7 @@ function Rider() {
                         </p>
                       </div>
                       <button
+                      onClick={()=>acceptRide(item._id)}
                         type="button"
                         className="px-3 mt-4 mb-4 py-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
                       >
