@@ -21,6 +21,21 @@ import {
   ModalBody,
   ModalCloseButton,
 } from "@chakra-ui/react";
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Text,
+  Heading,
+} from "@chakra-ui/react";
+import {
+  Avatar,
+  AvatarBadge,
+  AvatarGroup,
+  Wrap,
+  WrapItem,
+} from "@chakra-ui/react";
 
 import { io } from "socket.io-client";
 const socket = io("http://localhost:3005");
@@ -61,15 +76,18 @@ export default function Home() {
   useEffect(() => {
     socket.on("connection");
   }, []);
-  const [rideAcceptDetails, setRideAcceptDetails] = useState({})
+  const [rideAcceptDetails, setRideAcceptDetails] = useState(null);
+  console.log(rideAcceptDetails);
 
   const { isLoggedIn, userDetails } = useSelector((state) => state.user);
   useEffect(() => {
-    socket.on('acceptRide', (rideAcceptDetails)=>{
-      if(rideAcceptDetails.user == userDetails._id)
-      setRideAcceptDetails(rideAcceptDetails)
-    })
-  }, [socket])
+    socket.on("acceptRide", (rideAcceptDetails) => {
+      if (rideAcceptDetails.user == userDetails._id)
+        setRideAcceptDetails(rideAcceptDetails);
+      fetchRiderImage();
+    });
+  }, [socket]);
+
   const [phoneInput, setPhoneInput] = useState("");
   const [currentInputPos, setCurrentInputPos] = useState({
     lat: 27.700769,
@@ -82,7 +100,7 @@ export default function Home() {
 
   const pickInputRef = useRef(null);
   const [zoom, setZoom] = useState(13);
-  const [submittedReq, setSubmittedReq] = useState(false)
+  const [submittedReq, setSubmittedReq] = useState(false);
   const [priceChangeCount, setPriceChangeCount] = useState(10);
   const [isSelectionOngoing, setIsSelectionOngoing] = useState(false);
   const [pickInputAddress, setPickInputAddress] = useState("");
@@ -123,7 +141,6 @@ export default function Home() {
     });
     pickInputRef?.current?.focus();
   }, []);
-
   const generatePickUpPlaces = async (text) => {
     setPickUpOpen(true);
     setPickInputAddress(text);
@@ -167,6 +184,33 @@ export default function Home() {
     if (data) {
       setDestinationInputAddress(data.features[0].properties.formatted);
       setDestForRider(data.features[0].properties);
+    }
+  };
+  // rider Image
+  const [riderImage, setRiderImage] = useState(null);
+  const fetchRiderImage = async () => {
+    if (rideAcceptDetails) {
+      const riderId = rideAcceptDetails.rider._id;
+
+      try {
+        const response = await fetch(
+          `http://localhost:3005/users-image/${riderId}`
+        );
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+
+        // Set the riderImage state with the fetched image URL
+        setRiderImage(imageUrl);
+      } catch (error) {
+        console.error("Error fetching user image:", error);
+      }
+    } else {
+      // Handle the case where userDetails is null or undefined
+      console.error("userDetails is null or undefined");
     }
   };
 
@@ -242,8 +286,8 @@ export default function Home() {
   };
 
   const handleSubmitRequest = () => {
-    setSubmittedReq(!submittedReq)
-    if(!submittedReq){
+    setSubmittedReq(!submittedReq);
+    if (!submittedReq) {
       const rideDetails = {
         phoneNumber: phoneInput,
         currentInputPos,
@@ -262,13 +306,12 @@ export default function Home() {
         user: userDetails._id,
       };
       socket.emit("rides", rideDetails);
-    }else{
-      alert("your ride has been cancelled")
+    } else {
+      alert("your ride has been cancelled");
     }
-  
   };
   return (
-    <main className="dark:bg-[#37304E] flex">
+    <main className="dark:bg-[#37304E] flex text-white">
       <div className="w-2/5 p-4 bg-gray-200 dark:bg-gray-800">
         {/* Enter desitination and pickup  */}
         <div className="flex flex-col justify-center mt-8 w-full h-22 relative">
@@ -292,7 +335,6 @@ export default function Home() {
                 </div>
               ))}
           </div>
-                      {JSON.stringify(rideAcceptDetails)}
           {/* Pickup Section */}
           <div className="mb-6 flex justify-center flex-col relative">
             <div className="flex justify-between items-center">
@@ -543,7 +585,7 @@ export default function Home() {
                       type="button"
                       className="p-3 w-full my-4 text-center text-white bg-[#37304E] rounded-lg hover:bg-red-800"
                     >
-                    {submittedReq ? "Cancel Ride": "Submit Request"} 
+                      {submittedReq ? "Cancel Ride" : "Submit Request"}
                     </button>
                   ) : (
                     <button
@@ -580,6 +622,52 @@ export default function Home() {
             />
           )}
         </div>
+        {rideAcceptDetails && (
+          <div className="flex justify-center items-center ">
+            <Card align="center" maxW="60%" className="px-10">
+              <div className="flex flex-row justify-around items-center">
+                <div>
+                  <Wrap>
+                    <WrapItem>
+                      <Avatar
+                        size="2xl"
+                        name="Segun Adebayo"
+                        src={riderImage || "/defaultUserImage.png"}
+                      />{" "}
+                    </WrapItem>
+                  </Wrap>
+                </div>
+
+                <div>
+                  {" "}
+                  <CardHeader>
+                    <Heading size="md"> Ride Details</Heading>
+                  </CardHeader>
+                  <CardBody>
+                    <Text>
+                      <strong>Rider Full Name:</strong>
+                      {rideAcceptDetails?.rider?.fullName.toUpperCase()}
+                    </Text>
+                    <Text>
+                      <strong>Rider ETA:</strong>
+                    </Text>
+                    <Text>
+                      <strong>Ride ID:</strong> {rideAcceptDetails?._id}
+                    </Text>
+                    <Text>
+                      <strong>Rider's Vehicle:</strong>
+                      {rideAcceptDetails?.selectedVehicle?.vehicleType}
+                    </Text>
+                    <Text>
+                      <strong>Ride Final Fare:</strong>{" "}
+                      {rideAcceptDetails?.finalPrice}
+                    </Text>
+                  </CardBody>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     </main>
   );
