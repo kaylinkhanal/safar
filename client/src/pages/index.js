@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
 import Map from "../components/Map";
-import styles from "../styles/map.module.css";
 import { getDistance } from "geolib";
 import { useSelector } from "react-redux";
 import {
@@ -12,7 +11,16 @@ import {
   ModalBody,
   ModalCloseButton,
 } from "@chakra-ui/react";
-import { Card, Heading } from "@chakra-ui/react";
+
+import RideAcceptedCard from "../components/RideAcceptedCard";
+import VehicleIcons from "../components/VehicleIcons";
+import PickUpSection from "../components/PickUpSection";
+import DestinationSection from "../components/DestinationSection";
+import StopSection from "../components/StopSection";
+import PriceSection from "../components/PriceSection";
+import BargainSection from "../components/BargainSection";
+import SubmitCancelButton from "../components/SubmitCancelButton";
+import EnterDetailsButton from "../components/EnterDetailsButton";
 
 import { io } from "socket.io-client";
 const socket = io("http://localhost:3005");
@@ -262,332 +270,104 @@ export default function Home() {
     <main className="dark:bg-[#37304E] flex">
       <div className="w-2/5 p-5 bg-gray-200 dark:bg-gray-800">
         {/* Ride Accepted Card */}
-        {/* <div className="flex flex-col">
-          <Card className="p-5" align="center">
-            <Heading className="pb-3 text-[#37304E]" size="md">
-              Your Ride has been Accepted
-            </Heading>
-            <p className="text-xs">Rider Details</p>
-            <p className=" font-semibold text-[#37304E]">
-              Rider : {rideAcceptDetails?.rider?.fullName}
-            </p>
-            <p className=" font-semibold text-[#37304E]">
-              Number : {rideAcceptDetails?.rider?.phoneNumber}
-            </p>
-            <p className=" font-semibold text-[#37304E]">Vehicle No :</p>
-            <p>
-              Total Price to be Paid :{" "}
-              <strong>Rs{rideAcceptDetails?.finalPrice}</strong>
-            </p>
-            <p className="text-xs mt-5">Have a Safe and Happy Ride</p>
-          </Card>
-        </div> */}
+        <RideAcceptedCard rideAcceptDetails={rideAcceptDetails} />
 
         {/* Enter desitination and pickup  */}
         <div className="flex flex-col justify-center mt-8 w-full h-22 relative">
           {/* Icons Section */}
-          <div className="flex mb-2 items-center justify-center">
-            {vehicleTypeList.length > 0 &&
-              vehicleTypeList.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => setSelectedVehicle(item)}
-                  className={`
-                     bg-white p-3 rounded-lg shadow-xs mr-2
-                      ${
-                        item === selectedVehicle
-                          ? " border-2 border-slate-600 text-white"
-                          : ""
-                      }
-                  `}
-                >
-                  <img src={item.iconUrl} width={40} height={40} alt="icon" />
-                </div>
-              ))}
-          </div>
+          <VehicleIcons
+            vehicleTypeList={vehicleTypeList}
+            selectedVehicle={selectedVehicle}
+            setSelectedVehicle={setSelectedVehicle}
+          />
 
           {/* Pickup Section */}
-          <div className="mb-6 flex justify-center flex-col relative">
-            <div className="flex justify-between items-center">
-              <label
-                htmlFor="pickup"
-                className=" font-mono pb-1 text-gray-500 antialiased font-semibold line-clamp-1"
-              >
-                Pickup Address
-              </label>
-            </div>
-            <input
-              ref={pickInputRef}
-              value={pickInputAddress}
-              onFocus={() => setPickInputFocus(true)}
-              onBlur={() => {
-                !isSelectionOngoing && setPickUpOpen(false);
-                setPickInputFocus(false);
-              }}
-              onChange={(e) => generatePickUpPlaces(e.target.value)}
-              type="text"
-              id="default-input"
-              placeholder="Enter your pickup point or Locate on Map"
-              className="h-12 bg-red px-4 text-gray-900 text-center text-sm rounded-full shadow-inner shadow-slate-900"
-            />
-            {pickUpOpen && (
-              <div
-                className="absolute top-full left-0 w-full bg-white border border-gray-300 shadow-md z-10"
-                onMouseLeave={() => setIsSelectionOngoing(false)}
-                onMouseOver={() => setIsSelectionOngoing(true)}
-              >
-                {searchedPlaceList.length > 0 &&
-                  searchedPlaceList.map((item) => {
-                    return (
-                      <div
-                        onClick={() => {
-                          setCurrentInputPos({
-                            lat: item.lat,
-                            lng: item.lon,
-                          });
-                          setZoom(14);
-                          setPickInputAddress(item.formatted);
-                          setPickUpOpen(false);
-                        }}
-                        className={styles.autocompleteList}
-                      >
-                        {item.formatted.length > 15
-                          ? item.formatted.substring(0, 50) + "..."
-                          : item.formatted}
-                      </div>
-                    );
-                  })}
-              </div>
-            )}
-          </div>
+          <PickUpSection
+            pickInputRef={pickInputRef}
+            pickInputAddress={pickInputAddress}
+            pickUpOpen={pickUpOpen}
+            setPickInputFocus={setPickInputFocus}
+            generatePickUpPlaces={generatePickUpPlaces}
+            searchedPlaceList={searchedPlaceList}
+            setPickUpOpen={setPickUpOpen}
+            isSelectionOngoing={isSelectionOngoing}
+            setIsSelectionOngoing={setIsSelectionOngoing}
+            setCurrentInputPos={setCurrentInputPos}
+            setPickInputAddress={setPickInputAddress}
+            setZoom={setZoom}
+          />
           {/* Destination Section */}
-          <div className="flex justify-center flex-col relative">
-            <div className="flex justify-between items-center">
-              <label
-                htmlFor="pickup"
-                className=" font-mono pb-1 text-gray-500 antialiased font-semibold line-clamp-1"
-              >
-                Destination Address
-              </label>
-            </div>
-            <input
-              value={destinationInputAddress}
-              onBlur={() => {
-                !isSelectionOngoing && setDestinationOpen(false);
-              }}
-              onChange={(e) => generateDestinationPlaces(e.target.value)}
-              type="text"
-              id="default-input"
-              placeholder="Enter your destination point or Locate on Map"
-              className="h-12 bg-red px-4 text-gray-900 text-center text-sm rounded-full shadow-inner shadow-slate-900"
-            />
-            {destinationOpen && (
-              <div
-                className="absolute top-full left-0 w-full bg-white border border-gray-300 shadow-md"
-                onMouseLeave={() => setIsSelectionOngoing(false)}
-                onMouseOver={() => setIsSelectionOngoing(true)}
-              >
-                {searchedPlaceList.length > 0 &&
-                  searchedPlaceList.map((item) => {
-                    return (
-                      <div
-                        onClick={() => {
-                          setCurrentDestinationPos({
-                            lat: item.lat,
-                            lng: item.lon,
-                          });
-                          setZoom(14);
-                          setDestinationInputAddress(item.formatted);
-                          setDestinationOpen(false);
-                        }}
-                        className={styles.autocompleteList}
-                      >
-                        {item.formatted.length > 15
-                          ? item.formatted.substring(0, 50) + "..."
-                          : item.formatted}
-                      </div>
-                    );
-                  })}
-              </div>
-            )}
-          </div>
+          <DestinationSection
+            destinationInputAddress={destinationInputAddress}
+            isSelectionOngoing={isSelectionOngoing}
+            setDestinationOpen={setDestinationOpen}
+            generateDestinationPlaces={generateDestinationPlaces}
+            destinationOpen={destinationOpen}
+            setIsSelectionOngoing={setIsSelectionOngoing}
+            searchedPlaceList={searchedPlaceList}
+            setCurrentDestinationPos={setCurrentDestinationPos}
+            setDestinationInputAddress={setDestinationInputAddress}
+            setZoom={setZoom}
+          />
           {/* Stop Section */}
-          <div className="mb-5">
-            <button
-              type="button"
-              className="px-3 mt-4 mb-4 py-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
-              onClick={() => {
-                setStopPosition(stopPosition.lat ? {} : currentDestinationPos);
-
-                setStopInputVisible(!stopPosition.lat);
-              }}
-            >
-              {stopPosition.lat ? "Remove Stop" : "Add Stop"}
-            </button>
-            {stopInputVisible && (
-              <>
-                <div className="flex justify-between items-center">
-                  <label
-                    htmlFor="pickup"
-                    className=" font-mono pb-1 text-gray-500 antialiased font-semibold line-clamp-1"
-                  >
-                    Stop Address
-                  </label>
-                </div>
-                <input
-                  value={stopInputAddress}
-                  onBlur={() => {
-                    !isSelectionOngoing && setStopOpen(false);
-                  }}
-                  onChange={(e) => generateStopPlaces(e.target.value)}
-                  type="text"
-                  id="default-input"
-                  placeholder="Enter your Stop point or Locate on Map"
-                  className="h-12 w-full bg-red px-4 text-gray-900 text-center text-sm rounded-full shadow-inner shadow-slate-900"
-                />
-              </>
-            )}
-            {stopOpen && (
-              <div
-                className="absolute top-full left-0 w-full bg-white border border-gray-300 shadow-md z-10"
-                onMouseLeave={() => setIsSelectionOngoing(false)}
-                onMouseOver={() => setIsSelectionOngoing(true)}
-              >
-                {searchedPlaceList.length > 0 &&
-                  searchedPlaceList.map((item) => {
-                    return (
-                      <div
-                        onClick={() => {
-                          setStopPosition({
-                            lat: item.lat,
-                            lng: item.lon,
-                          });
-                          setZoom(14);
-                          setStopInputAddress(item.formatted);
-                          setStopOpen(false);
-                        }}
-                        className={styles.autocompleteList}
-                      >
-                        {item.formatted.length > 15
-                          ? item.formatted.substring(0, 50) + "..."
-                          : item.formatted}
-                      </div>
-                    );
-                  })}
-              </div>
-            )}
-          </div>
+          <StopSection
+            setStopPosition={setStopPosition}
+            stopPosition={stopPosition}
+            currentDestinationPos={currentDestinationPos}
+            setStopInputVisible={setStopInputVisible}
+            stopInputVisible={stopInputVisible}
+            stopInputAddress={stopInputAddress}
+            isSelectionOngoing={isSelectionOngoing}
+            setStopOpen={setStopOpen}
+            generateStopPlaces={generateStopPlaces}
+            stopOpen={stopOpen}
+            setIsSelectionOngoing={setIsSelectionOngoing}
+            searchedPlaceList={searchedPlaceList}
+            setZoom={setZoom}
+            setStopInputAddress={setStopInputAddress}
+          />
           <div className="text-[#37304E]">
             {/* Estimated Section */}
             {Object.keys(selectedVehicle).length > 0 &&
               pickInputAddress &&
               destinationInputAddress && (
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex">
-                      <h1>Estimated price :</h1>
-                      <p className="font-bold"> Rs{calculateEstPrice()}</p>
-                    </div>
-                    <div className="flex">
-                      <h1>Final price :</h1>
-                      <p className="font-bold">
-                        {" "}
-                        Rs{finalPrice || calculateEstPrice()}
-                      </p>
-                    </div>
-                  </div>
+                <>
+                  <PriceSection
+                    calculateEstPrice={calculateEstPrice}
+                    finalPrice={finalPrice}
+                  />
 
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h1>Change your Offer Price</h1>
-                    </div>
-                    <div>
-                      <button
-                        onClick={() => {
-                          if (
-                            finalPrice &&
-                            finalPrice - priceChangeCount >=
-                              selectedVehicle.basePrice
-                          ) {
-                            return setFinalPrice(finalPrice - priceChangeCount);
-                          } else if (
-                            !finalPrice &&
-                            calculateEstPrice() - priceChangeCount >=
-                              selectedVehicle.basePrice
-                          ) {
-                            return setFinalPrice(
-                              calculateEstPrice() - priceChangeCount
-                            );
-                          } else if (
-                            finalPrice - priceChangeCount <=
-                            selectedVehicle.basePrice
-                          ) {
-                            return setFinalPrice(selectedVehicle.basePrice);
-                          }
-                        }}
-                        className="p-3 m-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
-                      >
-                        -
-                      </button>
-                      <input
-                        value={priceChangeCount}
-                        onChange={(e) =>
-                          setPriceChangeCount(Number(e.target.value))
-                        }
-                        className="w-10 h-10 bg-gray-200 dark:bg-gray-800"
-                      />
-                      <button
-                        onClick={() =>
-                          setFinalPrice(
-                            finalPrice
-                              ? finalPrice + priceChangeCount
-                              : calculateEstPrice() + priceChangeCount
-                          )
-                        }
-                        className="p-3 m-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
+                  <BargainSection
+                    finalPrice={finalPrice}
+                    priceChangeCount={priceChangeCount}
+                    selectedVehicle={selectedVehicle}
+                    setFinalPrice={setFinalPrice}
+                    calculateEstPrice={calculateEstPrice}
+                    setPriceChangeCount={setPriceChangeCount}
+                  />
+
                   {isLoggedIn || phoneInput ? (
-                    <button
-                      onClick={() => handleSubmitRequest()}
-                      type="button"
-                      className="p-3 w-full my-4 text-center text-white bg-[#37304E] rounded-lg hover:bg-red-800"
-                    >
-                      {submittedReq ? "Cancel Ride" : "Submit Request"}
-                    </button>
+                    <SubmitCancelButton
+                      handleSubmitRequest={handleSubmitRequest}
+                      submittedReq={submittedReq}
+                    />
                   ) : (
-                    <button
-                      onClick={() => setPhoneValidationOpen(true)}
-                      type="button"
-                      className="p-3 w-full my-4 text-center text-white bg-[#37304E] rounded-lg hover:bg-red-800"
-                    >
-                      Enter Your Details
-                    </button>
+                    <EnterDetailsButton
+                      setPhoneValidationOpen={setPhoneValidationOpen}
+                    />
                   )}
-                </div>
+                </>
               )}
-            {/* Cancel Ride Button */}
-            {/* <button
-              onClick={() => handleSubmitRequest()}
-              type="button"
-              className="p-3 w-full my-4 text-center text-white bg-[#37304E] rounded-lg hover:bg-red-800"
-            >
-              {submittedReq && "Cancel Ride"}
-            </button> */}
           </div>
         </div>
-      </div>
-
-      <div className="w-3/5">
         <CustomModal
           isOpen={phoneValidationOpen}
           onClose={() => setPhoneValidationOpen(false)}
           setPhoneInput={setPhoneInput}
         />
+      </div>
 
+      <div className="w-3/5">
         {/* google map  */}
         <div className="">
           {isLoaded && (

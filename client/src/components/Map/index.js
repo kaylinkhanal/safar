@@ -34,7 +34,7 @@ function index(props) {
     <GoogleMap
       id="circle-example"
       mapContainerStyle={{
-        height: "700px",
+        height: "800px",
         width: "100%",
       }}
       zoom={zoom}
