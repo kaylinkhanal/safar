@@ -270,10 +270,12 @@ export default function Home() {
     <main className="dark:bg-[#37304E] flex">
       <div className="w-2/5 p-5 bg-gray-200 dark:bg-gray-800">
         {/* Ride Accepted Card */}
-        <RideAcceptedCard rideAcceptDetails={rideAcceptDetails} />
 
         {/* Enter desitination and pickup  */}
-        <div className="flex flex-col justify-center mt-8 w-full h-22 relative">
+         {JSON.stringify(rideAcceptDetails) !== '{}' ? (
+        <RideAcceptedCard rideAcceptDetails={rideAcceptDetails} />
+         ) : (
+          <div className="flex flex-col justify-center mt-8 w-full h-22 relative">
           {/* Icons Section */}
           <VehicleIcons
             vehicleTypeList={vehicleTypeList}
@@ -346,7 +348,14 @@ export default function Home() {
                     setPriceChangeCount={setPriceChangeCount}
                   />
 
-                  {isLoggedIn || phoneInput ? (
+
+                </>
+              )}
+          </div>
+        </div>
+      
+        )}
+        {isLoggedIn || phoneInput ? (
                     <SubmitCancelButton
                       handleSubmitRequest={handleSubmitRequest}
                       submittedReq={submittedReq}
@@ -356,10 +365,6 @@ export default function Home() {
                       setPhoneValidationOpen={setPhoneValidationOpen}
                     />
                   )}
-                </>
-              )}
-          </div>
-        </div>
         <CustomModal
           isOpen={phoneValidationOpen}
           onClose={() => setPhoneValidationOpen(false)}

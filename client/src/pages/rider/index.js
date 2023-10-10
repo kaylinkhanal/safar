@@ -9,6 +9,7 @@ import {
   AccordionButton,
   AccordionPanel,
 } from "@chakra-ui/react";
+import axios from 'axios'
 import { useSelector } from "react-redux";
 import Map from "../../components/Map";
 const socket = io("http://localhost:3005");
@@ -23,7 +24,13 @@ function Rider() {
   const { userDetails } = useSelector((state) => state.user);
   const [activeJob, setActiveJob] = useState(null);
 
+  const fetchExistingRides= async()=> {
+    const {data} = await axios.get('http://localhost:3005/rides?status=pending');
+    if (data) setAvailableRides(data.rideList)
+  }
   useEffect(() => {
+    fetchExistingRides()
+  
     socket.on("rides", (rides) => {
       setAvailableRides(rides);
     });

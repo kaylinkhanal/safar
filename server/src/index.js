@@ -15,6 +15,7 @@ app.use(cors());
 const connect = require("./db/connect");
 const UserRoute = require("./routes/user");
 const VehicleRoute = require("./routes/vehicle");
+const RidesRoute = require("./routes/rides");
 const Rides = require("./models/rides");
 connect();
 io.on("connection", (socket) => {
@@ -38,6 +39,7 @@ const port = process.env.PORT || 3005;
 
 app.use(UserRoute);
 app.use(VehicleRoute);
+app.use(RidesRoute);
 
 server.listen(port, () => {
   console.log(`Server is running on localhost ${port}`);
