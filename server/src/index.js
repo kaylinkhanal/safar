@@ -34,6 +34,11 @@ io.on("connection", (socket) => {
     const data = await Rides.findById(rideInfo.rideId).populate("rider");
     io.emit("acceptRide", data);
   });
+
+
+  socket.on("riderPosition",(riderPosition)=>{
+    io.emit("riderPosition", riderPosition);
+  })
 });
 const port = process.env.PORT || 3005;
 

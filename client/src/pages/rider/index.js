@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { MinusIcon } from "@chakra-ui/icons";
-import { useJsApiLoader } from "@react-google-maps/api";
+
 import {
   Accordion,
   Box,
@@ -17,10 +17,7 @@ const socket = io("http://localhost:3005");
 function Rider() {
   const [availableRides, setAvailableRides] = useState([]);
   const [selectedRideCard, setSelectedRideCard] = useState({});
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
-    libraries: ["places"],
-  });
+
   const { userDetails } = useSelector((state) => state.user);
   const [activeJob, setActiveJob] = useState(null);
 
@@ -34,10 +31,24 @@ function Rider() {
     socket.on("rides", (rides) => {
       setAvailableRides(rides);
     });
+
+ 
   }, []);
 
   const acceptRide = (rideId) => {
     socket.emit("acceptRide", { rideId, riderId: userDetails._id });
+    setInterval(()=>{
+      navigator.geolocation.getCurrentPosition((latlan) => {
+        const { latitude, longitude } = latlan.coords;
+        socket.emit('riderPosition' ,{
+          position: { lat: latitude, lng: longitude }, 
+          rideId: rideId
+        }
+        )
+      });
+    
+    },3000)
+  
   };
 
   return (
@@ -220,7 +231,7 @@ function Rider() {
 
       {/* Map Section */}
       <div className="w-3/5">
-        {isLoaded && (
+
           <Map
             isRider={true}
             currentInputPos={selectedRideCard.currentInputPos}
@@ -228,7 +239,7 @@ function Rider() {
             zoom={13}
             currentDestinationPos={selectedRideCard.currentDestinationPos}
           />
-        )}
+ 
       </div>
     </div>
   );

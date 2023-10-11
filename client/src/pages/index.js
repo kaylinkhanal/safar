@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useJsApiLoader } from "@react-google-maps/api";
+
 import Map from "../components/Map";
 import { getDistance } from "geolib";
 import { useSelector } from "react-redux";
@@ -11,7 +11,7 @@ import {
   ModalBody,
   ModalCloseButton,
 } from "@chakra-ui/react";
-
+const lists =["places"]
 import RideAcceptedCard from "../components/RideAcceptedCard";
 import VehicleIcons from "../components/VehicleIcons";
 import PickUpSection from "../components/PickUpSection";
@@ -62,13 +62,23 @@ export default function Home() {
     socket.on("connection");
   }, []);
   const [rideAcceptDetails, setRideAcceptDetails] = useState({});
-
+  const [riderPosition, setRiderPosition]= useState(null)
+  const [rideId, setRideId] = useState('')
   const { isLoggedIn, userDetails } = useSelector((state) => state.user);
   useEffect(() => {
     socket.on("acceptRide", (rideAcceptDetails) => {
       if (rideAcceptDetails.user == userDetails._id)
         setRideAcceptDetails(rideAcceptDetails);
     });
+
+    socket.on("riderPosition", (riderPosition) => {
+      setRideId(riderPosition.rideId)
+      if(riderPosition.rideId){
+        setRiderPosition(riderPosition.position)
+      }
+    });
+
+    
   }, [socket]);
   const [phoneInput, setPhoneInput] = useState("");
   const [currentInputPos, setCurrentInputPos] = useState({
@@ -101,10 +111,7 @@ export default function Home() {
   const [vehicleTypeList, setVehiclesTypeList] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState({});
   const [finalPrice, setFinalPrice] = useState("");
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
-    libraries: ["places"],
-  });
+  
   const [phoneValidationOpen, setPhoneValidationOpen] = useState(false);
   const getVehicleType = async (values) => {
     const res = await fetch("http://localhost:3005/vehicles/", {
@@ -270,7 +277,7 @@ export default function Home() {
     <main className="dark:bg-[#37304E] flex">
       <div className="w-2/5 p-5 bg-gray-200 dark:bg-gray-800">
         {/* Ride Accepted Card */}
-
+{rideId}
         {/* Enter desitination and pickup  */}
          {JSON.stringify(rideAcceptDetails) !== '{}' ? (
         <RideAcceptedCard rideAcceptDetails={rideAcceptDetails} />
@@ -375,17 +382,19 @@ export default function Home() {
       <div className="w-3/5">
         {/* google map  */}
         <div className="">
-          {isLoaded && (
+       
             <Map
               currentInputPos={currentInputPos}
               stopPosition={stopPosition}
+              riderPosition={riderPosition}
               changeStopAddress={changeStopAddress}
               changePickUpAddress={changePickUpAddress}
               changeDestinationAddress={changeDestinationAddress}
               zoom={zoom}
+              rideId={rideId}
               currentDestinationPos={currentDestinationPos}
             />
-          )}
+      
         </div>
       </div>
     </main>
