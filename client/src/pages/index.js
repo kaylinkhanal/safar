@@ -268,6 +268,7 @@ export default function Home() {
         finalPrice: finalPrice || calculateEstPrice(),
         user: userDetails._id,
       };
+
       socket.emit("rides", rideDetails);
     } else {
       alert("your ride has been cancelled");

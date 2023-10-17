@@ -33,9 +33,10 @@ const getVehicleInfo = async (req, res) => {
 };
 
 const getVehicles = async (req, res) => {
-  const vehicleList = await Vehicle.find();
+  const vehicleList = await Vehicle.find()
   return res.json(vehicleList);
 };
+
 
 module.exports = {
   addVehicleInfo,
