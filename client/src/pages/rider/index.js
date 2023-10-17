@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { MinusIcon } from "@chakra-ui/icons";
-import { useJsApiLoader } from "@react-google-maps/api";
+
 import {
   Accordion,
   Box,
@@ -9,29 +9,47 @@ import {
   AccordionButton,
   AccordionPanel,
 } from "@chakra-ui/react";
-import {useSelector} from 'react-redux'
+import axios from 'axios'
+import { useSelector } from "react-redux";
 import Map from "../../components/Map";
 const socket = io("http://localhost:3005");
 
 function Rider() {
   const [availableRides, setAvailableRides] = useState([]);
   const [selectedRideCard, setSelectedRideCard] = useState({});
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyCBYY-RtAAYnN1w_wAFmsQc2wz0ReCjriI", // ,
-    libraries: ["places"],
-  });
-  const {  userDetails } = useSelector((state) => state.user);
+
+  const { userDetails } = useSelector((state) => state.user);
   const [activeJob, setActiveJob] = useState(null);
 
+  const fetchExistingRides= async()=> {
+    const {data} = await axios.get('http://localhost:3005/rides?status=pending');
+    if (data) setAvailableRides(data.rideList)
+  }
   useEffect(() => {
+    fetchExistingRides()
+  
     socket.on("rides", (rides) => {
       setAvailableRides(rides);
     });
+
+ 
   }, []);
 
-  const acceptRide =(rideId)=>{
-    socket.emit('acceptRide', {rideId, riderId:  userDetails._id})
-  }
+  const acceptRide = (rideId) => {
+    socket.emit("acceptRide", { rideId, riderId: userDetails._id });
+    setInterval(()=>{
+      navigator.geolocation.getCurrentPosition((latlan) => {
+        const { latitude, longitude } = latlan.coords;
+        socket.emit('riderPosition' ,{
+          position: { lat: latitude, lng: longitude }, 
+          rideId: rideId
+        }
+        )
+      });
+    
+    },3000)
+  
+  };
 
   return (
     <div className="flex">
@@ -70,8 +88,6 @@ function Rider() {
                               <div>
                                 <MinusIcon width={2} />
                                 <MinusIcon width={2} />
-                                <MinusIcon width={2} />
-                                <MinusIcon width={2} />
                               </div>
                               <div className="p-2">
                                 <img
@@ -82,8 +98,6 @@ function Rider() {
                                 />
                               </div>
                               <div>
-                                <MinusIcon width={2} />
-                                <MinusIcon width={2} />
                                 <MinusIcon width={2} />
                                 <MinusIcon width={2} />
                               </div>
@@ -94,7 +108,6 @@ function Rider() {
                             <div className="flex items-center">
                               <div>
                                 <MinusIcon width={2} />
-                                <MinusIcon width={2} />
                               </div>
                               <div className="p-2">
                                 <img
@@ -105,7 +118,6 @@ function Rider() {
                                 />
                               </div>
                               <div>
-                                <MinusIcon width={2} />
                                 <MinusIcon width={2} />
                               </div>
                             </div>
@@ -127,7 +139,6 @@ function Rider() {
                             <div className="flex items-center">
                               <div>
                                 <MinusIcon width={2} />
-                                <MinusIcon width={2} />
                               </div>
                               <div className="p-2">
                                 <img
@@ -138,7 +149,6 @@ function Rider() {
                                 />
                               </div>
                               <div>
-                                <MinusIcon width={2} />
                                 <MinusIcon width={2} />
                               </div>
                             </div>
@@ -170,14 +180,42 @@ function Rider() {
                     </AccordionButton>
 
                     <AccordionPanel className=" bg-slate-200" pb={4}>
-                      <div className="flex text-center justify-center">
+                      <div className="flex flex-col ">
+                        <div className="flex flex-col items-start bg-white p-2 rounded-lg mb-1">
+                          <p className="text-sm font-semibold leading-8">
+                            PickUp :
+                          </p>
+                          <p className="text-sm text-left">
+                            {item.pickInputAddress}
+                          </p>
+                        </div>
+                        {item.stopForRider && (
+                          <div className="flex flex-col items-start bg-white p-2 rounded-lg mb-1">
+                            <p className="text-sm font-semibold leading-8">
+                              Stop :
+                            </p>
+                            <p className="text-sm text-left">
+                              {item.stopInputAddress}
+                            </p>
+                          </div>
+                        )}
+                        <div className="flex flex-col items-start bg-white p-2 rounded-lg">
+                          <p className="text-sm font-semibold leading-8">
+                            Destination :
+                          </p>
+                          <p className="text-sm text-left">
+                            {item.destinationInputAddress}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex leading-8">
                         <h1>Customer Number :</h1>
                         <p className="font-bold">
                           {item.phoneNumber || item.user?.phoneNumber}
                         </p>
                       </div>
                       <button
-                      onClick={()=>acceptRide(item._id)}
+                        onClick={() => acceptRide(item._id)}
                         type="button"
                         className="px-3 mt-4 mb-4 py-2 text-sm font-medium text-center items-center text-white bg-[#37304E] rounded-lg hover:bg-red-800 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700"
                       >
@@ -192,8 +230,8 @@ function Rider() {
       </div>
 
       {/* Map Section */}
-      <div className="w-3/5 p-4">
-        {isLoaded && (
+      <div className="w-3/5">
+
           <Map
             isRider={true}
             currentInputPos={selectedRideCard.currentInputPos}
@@ -201,7 +239,7 @@ function Rider() {
             zoom={13}
             currentDestinationPos={selectedRideCard.currentDestinationPos}
           />
-        )}
+ 
       </div>
     </div>
   );
